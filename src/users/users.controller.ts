@@ -12,9 +12,9 @@ import { User } from 'src/interfaces/User.interface';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 
-@Controller('users')
+@Controller('api/v1/users')
 export class UsersController {
-  constructor(private userService: UsersService) {}
+  constructor(private readonly userService: UsersService) {}
 
   @Get()
   findAllUsers(): Promise<User[]> {

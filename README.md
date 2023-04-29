@@ -22,7 +22,7 @@
 
 ## Create a user 
 
-- Send a POST request to /user with a JSON payload containing the data.
+- Send a POST request to /api/v1/users with a JSON payload containing the data.
 
 ```json
 {
@@ -36,15 +36,15 @@
 
 ## Get all users
 
-- Send a GET request to `/user`. This will return an array list of all users.
+- Send a GET request to `/api/v1/users`. This will return an array list of all users.
 
 ## Get a specific user 
 
-- Send a GET request to `/user/{id}`, where {id} is the ID of the user you want to retrieve.
+- Send a GET request to `/api/v1/users/{id}`, where {id} is the ID of the user you want to retrieve.
 
 ## Update a user 
 
-- Send a PUT request to `/user/{id}`, where {id} is the ID of the user you want to update.\* Include a JSON payload containing the updated user data.
+- Send a PUT request to `/api/v1/users/{id}`, where {id} is the ID of the user you want to update.\* Include a JSON payload containing the updated user data.
 
 ```json
 {
@@ -55,4 +55,4 @@
 
 ## Delete a user 
 
-- Send a DELETE request to `/user/{id}`, where {id} is the ID of the user you want to delete.
+- Send a DELETE request to `/api/v1/users/{id}`, where {id} is the ID of the user you want to delete.

@@ -12,32 +12,37 @@ export class UsersService {
     email: '',
     password: '',
   };
-  // @routes /users
+
+  // @routes /api/v1/users
   // @method GET request
   // @desc retrieve all users
   async findAll(): Promise<User[]> {
     return [];
   }
-  // @routes /users/:id
+
+  // @routes /api/v1/users/:id
   // @method GET request
   // @desc retrieve user with a given id
   async findOne(id: string): Promise<User> {
     return this.user;
   }
-  // @routes /users
+
+  // @routes /api/v1/users
   // @method POST request
   // @desc create new user
   async create(createDto: CreateUserDto): Promise<User> {
     console.log(createDto);
     return createDto;
   }
-  // @routes /users/:id
+
+  // @routes /api/v1/users/:id
   // @method PUT request
   // @desc update user details with a given id
   async update(id: string, updateDto: UpdateUserDto): Promise<User> {
     return this.user;
   }
-  // @routes /users/:id
+
+  // @routes /api/v1/users/:id
   // @method DELETE request
   // @desc delete user with a given id
   async delete(id: string): Promise<User> {
