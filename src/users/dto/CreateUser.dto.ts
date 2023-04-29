@@ -5,8 +5,7 @@ export class CreateUserDto {
   readonly last_name: string;
   readonly email: string;
   readonly password: string;
-  readonly username: string;
-  readonly confirm_password: string;
+  readonly username?: string;
   readonly gender?: Gender;
   readonly phone_no?: number;
   readonly avatar?: string;
