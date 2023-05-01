@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { UsersModule } from './users/users.module';
@@ -9,6 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserEntity } from './users/entity/User.entity';
 import { EventsModule } from './events/events.module';
 import { EventEntity } from './events/entity/Event.entity';
+import { EventsController } from './events/events.controller';
+import { EventsService } from './events/events.service';
 
 @Module({
   imports: [
@@ -30,7 +30,8 @@ import { EventEntity } from './events/entity/Event.entity';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AppController, UsersController],
-  providers: [AppService, UsersService],
+  controllers: [UsersController, EventsController],
+  providers: [UsersService, EventsService],
 })
 export class AppModule {}
+ 
