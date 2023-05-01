@@ -44,7 +44,6 @@ export class UsersService {
   // @desc create new user
   async create(createDto: CreateUserDto): Promise<User> {
     const { error, value } = validateCreateUser(createDto);
-    // console.log(value);
     if (error) {
       return error.message;
     }

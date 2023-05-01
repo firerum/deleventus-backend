@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn, Generated } from 'typeorm';
+import { EventEntity } from 'src/events/entity/Event.entity';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Generated,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class UserEntity {
@@ -29,6 +37,9 @@ export class UserEntity {
 
   @Column({ nullable: true })
   country: string;
+
+  //   @OneToMany(() => EventEntity, (eventEntity) => eventEntity.user)
+  //   events: EventEntity[];
 
   @Column({
     type: 'timestamptz',
