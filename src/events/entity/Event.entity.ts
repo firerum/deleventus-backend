@@ -32,15 +32,15 @@ export class EventEntity {
   @Column({ nullable: true, default: 'public' })
   visibility: string;
 
-  @Column()
-  user_email: string;
+  //   @Column()
+  //   user_email: string;
 
-  //   @ManyToOne(() => UserEntity, (userEntity) => userEntity.events)
-  //   @JoinColumn({
-  //     name: 'user_email',
-  //     referencedColumnName: 'email',
-  //   })
-  //   user: UserEntity;
+  @ManyToOne(() => UserEntity, (userEntity) => userEntity.events)
+  @JoinColumn({
+    name: 'user_email',
+    referencedColumnName: 'email',
+  })
+  user: UserEntity;
 
   @Column({
     type: 'timestamptz',

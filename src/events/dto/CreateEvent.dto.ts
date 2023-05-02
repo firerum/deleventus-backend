@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsEmail } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsDateString,
+  IsDate,
+} from 'class-validator';
 
 export class CreateEventDto {
   @IsString()
@@ -13,7 +19,7 @@ export class CreateEventDto {
   @IsNotEmpty()
   readonly venue: string;
 
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
   readonly date_of_event: string;
 
@@ -22,10 +28,6 @@ export class CreateEventDto {
   readonly description: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   readonly visibility: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  readonly user_email: string;
 }

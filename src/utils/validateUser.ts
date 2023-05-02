@@ -1,4 +1,5 @@
 import * as Joi from 'joi';
+import { AuthDto } from 'src/auth/dto/Auth.dto';
 import { CreateUserDto } from 'src/users/dto/CreateUser.dto';
 import { UpdateUserDto } from 'src/users/dto/UpdateUser.dto';
 
@@ -16,7 +17,7 @@ export const validateCreateUser = (body: CreateUserDto): any => {
 };
 
 // user login schema
-export const validateLogin = (body) => {
+export const validateSignIn = (body: AuthDto): any => {
   const schema = Joi.object({
     email: Joi.string().email().lowercase().min(3).trim().required(),
     password: Joi.string().required(),

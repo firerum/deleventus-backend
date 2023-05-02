@@ -14,15 +14,13 @@ export const validateCreateEvent = (
       .default('wedding')
       .required(),
     venue: Joi.string().lowercase().required(),
-    date_of_event: Joi.date().required(),
+    date_of_event: Joi.date().timestamp().required(),
     description: Joi.string().lowercase(),
     created_at: Joi.date().timestamp().default(new Date()),
     visibility: Joi.string()
       .valid('private', 'public')
       .lowercase()
-      .default('public')
-      .required(),
-    user_email: Joi.string().email().lowercase().trim().required(),
+      .default('public'),
   });
   return schema.validate(body);
 };
@@ -38,14 +36,13 @@ export const validateUpdateEvent = (
       .default('wedding')
       .lowercase(),
     venue: Joi.string().lowercase(),
-    date_of_event: Joi.date(),
+    date_of_event: Joi.date().timestamp(),
     description: Joi.string().lowercase(),
     updated_at: Joi.date().timestamp().default(new Date()),
     visibility: Joi.string()
       .valid('private', 'public')
       .lowercase()
       .default('public'),
-    user_email: Joi.string().email().lowercase().trim(),
   });
   return schema.validate(body);
 };

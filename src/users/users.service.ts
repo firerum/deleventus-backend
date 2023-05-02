@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Gender, User } from 'src/interfaces/User.interface';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
@@ -35,25 +35,25 @@ export class UsersService {
   // @routes /api/v1/users
   // @method POST request
   // @desc create new user
-  async create(createDto: CreateUserDto): Promise<User> {
-    const { error, value } = validateCreateUser(createDto);
-    if (error) {
-      return error.message;
-    }
-    const hash = await argon.hash(value.password);
-    const query = `
-          INSERT INTO user_entity(first_name, last_name, email, password)
-          VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING
-          RETURNING *
-      `;
-    const { rows } = await this.pgService.pool.query(query, [
-      value.first_name,
-      value.last_name,
-      value.email,
-      (value.password = hash),
-    ]);
-    return rows[0];
-  }
+  //   async create(createDto: CreateUserDto): Promise<User> {
+  //     const { error, value } = validateCreateUser(createDto);
+  //     if (error) {
+  //       return error.message;
+  //     }
+  //     const hash = await argon.hash(value.password);
+  //     const query = `
+  //           INSERT INTO user_entity(first_name, last_name, email, password)
+  //           VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING
+  //           RETURNING *
+  //       `;
+  //     const { rows } = await this.pgService.pool.query(query, [
+  //       value.first_name,
+  //       value.last_name,
+  //       value.email,
+  //       (value.password = hash),
+  //     ]);
+  //     return rows[0];
+  //   }
 
   // @routes /api/v1/users/:id
   // @method PUT request
@@ -72,18 +72,20 @@ export class UsersService {
       city,
       country,
       phone_no,
+      username,
       updated_at,
     } = value;
+
     //check if user already exists and pre-populate the properties that weren't updated
     const result = await this.pgService.pool.query(
       `SELECT * FROM user_entity WHERE id = $1`,
       [id],
     );
-    const [user] = result.rows;
+    const [user]: [User] = result.rows;
     const query = `
           UPDATE user_entity SET 
-          first_name = $1, last_name = $2, email = $3, gender = $4, password = $5, country = $6, city = $7, phone_no = $8, updated_at = $9 
-          WHERE id = $10
+          first_name = $1, last_name = $2, email = $3, gender = $4, password = $5, country = $6, city = $7, phone_no = $8, username = $9, updated_at = $10 
+          WHERE id = $11
           RETURNING *
       `;
     const { rows } = await this.pgService.pool.query(query, [
@@ -95,6 +97,7 @@ export class UsersService {
       country ?? user?.country,
       city ?? user?.city,
       phone_no ?? user.phone_no,
+      username ?? user.username,
       updated_at,
       id,
     ]);

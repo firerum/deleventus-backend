@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { PgModule } from './pg/pg.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -37,6 +38,6 @@ import { PgModule } from './pg/pg.module';
     }),
   ],
   controllers: [UsersController, EventsController, AuthController],
-  providers: [UsersService, EventsService, AuthService],
+  providers: [UsersService, EventsService, AuthService, JwtService],
 })
 export class AppModule {}

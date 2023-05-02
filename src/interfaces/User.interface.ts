@@ -14,4 +14,5 @@ export interface User {
   phone_no?: number;
   avatar?: string;
   country?: string;
+  city?: string;
 }

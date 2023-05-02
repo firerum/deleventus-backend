@@ -30,6 +30,9 @@ export class UserEntity {
   gender: string;
 
   @Column({ nullable: true })
+  username: string;
+
+  @Column({ nullable: true })
   phone_no: string;
 
   @Column({ nullable: true })
@@ -38,8 +41,8 @@ export class UserEntity {
   @Column({ nullable: true })
   country: string;
 
-  //   @OneToMany(() => EventEntity, (eventEntity) => eventEntity.user)
-  //   events: EventEntity[];
+  @OneToMany(() => EventEntity, (eventEntity) => eventEntity.user)
+  events: EventEntity[];
 
   @Column({
     type: 'timestamptz',

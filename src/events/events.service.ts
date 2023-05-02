@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { UserEvent } from 'src/interfaces/UserEvent.interface';
 import { CreateEventDto } from './dto/CreateEvent.dto';
 import { UpdateEventDto } from './dto/UpdateEvent.dto';
@@ -15,9 +15,10 @@ export class EventsService {
   // @routes /api/v1/events
   // @method GET request
   // @desc retrieve all events
-  async findAll(): Promise<UserEvent[]> {
+  async findAll(email: string): Promise<UserEvent[]> {
     const { rows } = await this.pgService.pool.query(
-      'SELECT * FROM event_entity',
+      'SELECT * FROM event_entity WHERE user_email = $1',
+      [email],
     );
     return rows;
   }
@@ -37,14 +38,12 @@ export class EventsService {
   // @routes /api/v1/events
   // @method POST request
   // @desc create new event
-  async create(createDto: CreateEventDto): Promise<UserEvent> {
+  async create(createDto: CreateEventDto, email): Promise<UserEvent> {
     const { error, value } = validateCreateEvent(createDto);
-    console.log(value);
-    // if (error) {
-    //   return error.message;
-    // }
-    const { name, category, venue, date_of_event, description, user_email } =
-      value;
+    if (error) {
+      throw new ForbiddenException(error.message);
+    }
+    const { name, category, venue, date_of_event, description } = value;
     const query = `
           INSERT INTO event_entity(name, category, venue, date_of_event, description, user_email)
           VALUES ($1, $2, $3, $4, $5, $6) 
@@ -56,7 +55,7 @@ export class EventsService {
       venue,
       date_of_event,
       description,
-      user_email,
+      email,
     ]);
     return rows[0];
   }
@@ -64,11 +63,15 @@ export class EventsService {
   // @routes /api/v1/events/:id
   // @method PUT request
   // @desc update event details with a given id
-  async update(id: string, updateDto: UpdateEventDto): Promise<UserEvent> {
+  async update(
+    id: string,
+    updateDto: UpdateEventDto,
+    email: string,
+  ): Promise<UserEvent> {
     const { error, value } = validateUpdateEvent(updateDto);
-    // if (error) {
-    //   return error.message;
-    // }
+    if (error) {
+      throw new ForbiddenException(error.message);
+    }
     const {
       name,
       category,
@@ -84,6 +87,9 @@ export class EventsService {
       [id],
     );
     const [event]: [UserEvent] = result.rows;
+    if (email !== event.user_email) {
+      throw new ForbiddenException('Unauthorized User');
+    }
     const query = `
           UPDATE event_entity SET 
           name = $1, category = $2, venue = $3, date_of_event = $4, description = $5,
@@ -107,7 +113,16 @@ export class EventsService {
   // @routes /api/v1/events/:id
   // @method DELETE request
   // @desc delete event with a given id
-  async delete(id: string): Promise<void> {
+  async delete(id: string, email: string): Promise<void> {
+    const query = `
+         SELECT * FROM event_entity
+         WHERE id = $1
+       `;
+    const { rows } = await this.pgService.pool.query(query, [id]);
+    const [event]: [UserEvent] = rows;
+    if (event.user_email !== email) {
+      throw new ForbiddenException('Unauthorized access');
+    }
     await this.pgService.pool.query('DELETE FROM event_entity WHERE id = $1', [
       id,
     ]);

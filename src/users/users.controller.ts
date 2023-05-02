@@ -6,11 +6,13 @@ import {
   Put,
   Delete,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from 'src/interfaces/User.interface';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -26,11 +28,12 @@ export class UsersController {
     return this.userService.findOne(id);
   }
 
-  @Post()
-  createUser(@Body() createDto: CreateUserDto): Promise<User> {
-    return this.userService.create(createDto);
-  }
+  //   @Post()
+  //   createUser(@Body() createDto: CreateUserDto): Promise<User> {
+  //     return this.userService.create(createDto);
+  //   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   updateUser(
     @Param('id') id: string,
