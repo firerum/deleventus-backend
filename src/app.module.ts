@@ -9,12 +9,18 @@ import { EventsModule } from './events/events.module';
 import { EventEntity } from './events/entity/Event.entity';
 import { EventsController } from './events/events.controller';
 import { EventsService } from './events/events.service';
+import { AuthModule } from './auth/auth.module';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { PgModule } from './pg/pg.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     UsersModule,
     EventsModule,
+    AuthModule,
+    PgModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -30,8 +36,7 @@ import { EventsService } from './events/events.service';
       inject: [ConfigService],
     }),
   ],
-  controllers: [UsersController, EventsController],
-  providers: [UsersService, EventsService],
+  controllers: [UsersController, EventsController, AuthController],
+  providers: [UsersService, EventsService, AuthService],
 })
 export class AppModule {}
- 

@@ -9,7 +9,6 @@ export const validateCreateUser = (body: CreateUserDto): any => {
     last_name: Joi.string().lowercase().min(3).trim().required(),
     email: Joi.string().lowercase().email().min(3).trim().required(),
     password: Joi.string().min(6).required(),
-    confirm_password: Joi.string().min(6).required(),
     created_at: Joi.date().timestamp().default(new Date()),
   });
 

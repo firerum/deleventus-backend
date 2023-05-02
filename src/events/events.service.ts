@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Pool } from 'pg';
 import { UserEvent } from 'src/interfaces/UserEvent.interface';
 import { CreateEventDto } from './dto/CreateEvent.dto';
 import { UpdateEventDto } from './dto/UpdateEvent.dto';
@@ -7,26 +6,19 @@ import {
   validateCreateEvent,
   validateUpdateEvent,
 } from 'src/utils/validateEvent';
+import { PgService } from 'src/pg/pg.service';
 
 @Injectable()
 export class EventsService {
-  private readonly pool: Pool;
-
-  constructor() {
-    this.pool = new Pool({
-      user: process.env.DB_USERNAME,
-      host: process.env.DB_HOST,
-      database: process.env.DB_NAME,
-      date_of_event: process.env.DB_PASSWORD,
-      port: process.env.DB_PORT,
-    });
-  }
+  constructor(private readonly pgService: PgService) {}
 
   // @routes /api/v1/events
   // @method GET request
   // @desc retrieve all events
   async findAll(): Promise<UserEvent[]> {
-    const { rows } = await this.pool.query('SELECT * FROM event_entity');
+    const { rows } = await this.pgService.pool.query(
+      'SELECT * FROM event_entity',
+    );
     return rows;
   }
 
@@ -38,7 +30,7 @@ export class EventsService {
          SELECT * FROM event_entity
          WHERE id = $1
        `;
-    const { rows } = await this.pool.query(query, [id]);
+    const { rows } = await this.pgService.pool.query(query, [id]);
     return rows[0];
   }
 
@@ -58,7 +50,7 @@ export class EventsService {
           VALUES ($1, $2, $3, $4, $5, $6) 
           RETURNING *
       `;
-    const { rows } = await this.pool.query(query, [
+    const { rows } = await this.pgService.pool.query(query, [
       name,
       category,
       venue,
@@ -87,7 +79,7 @@ export class EventsService {
       updated_at,
     } = value;
     //check if event already exists and pre-populate the properties that weren't updated
-    const result = await this.pool.query(
+    const result = await this.pgService.pool.query(
       `SELECT * FROM event_entity WHERE id = $1`,
       [id],
     );
@@ -99,7 +91,7 @@ export class EventsService {
           WHERE id = $8
           RETURNING *
       `;
-    const { rows } = await this.pool.query(query, [
+    const { rows } = await this.pgService.pool.query(query, [
       name ?? event?.name,
       category ?? event?.category,
       venue ?? event?.venue,
@@ -116,6 +108,8 @@ export class EventsService {
   // @method DELETE request
   // @desc delete event with a given id
   async delete(id: string): Promise<void> {
-    await this.pool.query('DELETE FROM event_entity WHERE id = $1', [id]);
+    await this.pgService.pool.query('DELETE FROM event_entity WHERE id = $1', [
+      id,
+    ]);
   }
 }
