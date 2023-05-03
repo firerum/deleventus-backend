@@ -25,8 +25,7 @@ export class EventsController {
 
   @Get()
   findAllEvents(@UserRequestObject() user: User): Promise<UserEvent[]> {
-    console.log(user);
-    return this.eventService.findAll(user.email);
+    return this.eventService.findAll(user.id);
   }
 
   @Get(':id')
@@ -40,7 +39,7 @@ export class EventsController {
     @Body() createDto: CreateEventDto,
     @UserRequestObject() user: User,
   ): Promise<UserEvent> {
-    return this.eventService.create(createDto, user.email);
+    return this.eventService.create(createDto, user.id);
   }
 
   @Put(':id')
@@ -49,7 +48,7 @@ export class EventsController {
     @Body() updateDto: UpdateEventDto,
     @UserRequestObject() user: User,
   ): Promise<UserEvent> {
-    return this.eventService.update(id, updateDto, user.email);
+    return this.eventService.update(id, updateDto, user.id);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -58,6 +57,6 @@ export class EventsController {
     @Param('id') id: string,
     @UserRequestObject() user: User,
   ): Promise<void> {
-    return this.eventService.delete(id, user.email);
+    return this.eventService.delete(id, user.id);
   }
 }

@@ -15,10 +15,10 @@ export class EventsService {
   // @routes /api/v1/events
   // @method GET request
   // @desc retrieve all events
-  async findAll(email: string): Promise<UserEvent[]> {
+  async findAll(user_id: string): Promise<UserEvent[]> {
     const { rows } = await this.pgService.pool.query(
-      'SELECT * FROM event_entity WHERE user_email = $1',
-      [email],
+      'SELECT * FROM event_entity WHERE user_id = $1',
+      [user_id],
     );
     return rows;
   }
@@ -38,15 +38,16 @@ export class EventsService {
   // @routes /api/v1/events
   // @method POST request
   // @desc create new event
-  async create(createDto: CreateEventDto, email: string): Promise<UserEvent> {
+  async create(createDto: CreateEventDto, user_id: string): Promise<UserEvent> {
     const { error, value } = validateCreateEvent(createDto);
     if (error) {
       throw new ForbiddenException(error.message);
     }
-    const { name, category, venue, date_of_event, description } = value;
+    const { name, category, venue, date_of_event, description, visibility } =
+      value;
     const query = `
-          INSERT INTO event_entity(name, category, venue, date_of_event, description, user_email)
-          VALUES ($1, $2, $3, $4, $5, $6) 
+          INSERT INTO event_entity(name, category, venue, date_of_event, description, visibility, user_id)
+          VALUES ($1, $2, $3, $4, $5, $6, $7) 
           RETURNING *
       `;
     const { rows } = await this.pgService.pool.query(query, [
@@ -55,7 +56,8 @@ export class EventsService {
       venue,
       date_of_event,
       description,
-      email,
+      visibility,
+      user_id,
     ]);
     return rows[0];
   }
@@ -66,7 +68,7 @@ export class EventsService {
   async update(
     id: string,
     updateDto: UpdateEventDto,
-    email: string,
+    user_id: string,
   ): Promise<UserEvent> {
     const { error, value } = validateUpdateEvent(updateDto);
     if (error) {
@@ -87,7 +89,7 @@ export class EventsService {
       [id],
     );
     const [event]: [UserEvent] = result.rows;
-    if (email !== event.user_email) {
+    if (user_id !== event.user_id) {
       throw new ForbiddenException('Unauthorized User');
     }
     const query = `
@@ -113,14 +115,14 @@ export class EventsService {
   // @routes /api/v1/events/:id
   // @method DELETE request
   // @desc delete event with a given id
-  async delete(id: string, email: string): Promise<void> {
+  async delete(id: string, user_id: string): Promise<void> {
     const query = `
          SELECT * FROM event_entity
          WHERE id = $1
        `;
     const { rows } = await this.pgService.pool.query(query, [id]);
     const [event]: [UserEvent] = rows;
-    if (event.user_email !== email) {
+    if (event.user_id !== user_id) {
       throw new ForbiddenException('Unauthorized access');
     }
     await this.pgService.pool.query('DELETE FROM event_entity WHERE id = $1', [

@@ -19,5 +19,5 @@ export interface UserEvent {
   visibility: Visibilty;
   avatar: string;
   updated_at?: string;
-  user_email?: string;
+  user_id?: string;
 }

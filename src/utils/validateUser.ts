@@ -20,7 +20,7 @@ export const validateCreateUser = (body: CreateUserDto): any => {
 export const validateSignIn = (body: AuthDto): any => {
   const schema = Joi.object({
     email: Joi.string().email().lowercase().min(3).trim().required(),
-    password: Joi.string().required(),
+    password: Joi.string().min(6).required(),
   });
   return schema.validate(body);
 };
