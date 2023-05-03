@@ -32,8 +32,8 @@ export class EventEntity {
   @Column({ nullable: true, default: 'public' })
   visibility: string;
 
-  //   @Column()
-  //   user_email: string;
+  @Column({ nullable: true })
+  avatar: string;
 
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.events)
   @JoinColumn({

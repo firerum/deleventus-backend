@@ -10,12 +10,14 @@ export enum Category {
 }
 
 export interface UserEvent {
+  id: string;
   name: string;
   category: Category;
   venue: string;
   date_of_event: string;
   description: string;
   visibility: Visibilty;
+  avatar: string;
   updated_at?: string;
   user_email?: string;
 }

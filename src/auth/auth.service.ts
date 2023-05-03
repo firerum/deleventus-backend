@@ -63,6 +63,7 @@ export class AuthService {
     return this.signToken(user.email);
   }
 
+  // create token
   async signToken(email: string): Promise<{ access_token: string }> {
     const payload = { email };
     const token = await this.jwt.signAsync(payload, {

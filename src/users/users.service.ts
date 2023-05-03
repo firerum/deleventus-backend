@@ -1,10 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { Gender, User } from 'src/interfaces/User.interface';
-import { CreateUserDto } from './dto/CreateUser.dto';
+import { User } from 'src/interfaces/User.interface';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
-import { validateCreateUser, validateUpdateUser } from 'src/utils/validateUser';
+import { validateUpdateUser } from 'src/utils/validateUser';
 import { PgService } from 'src/pg/pg.service';
-import * as argon from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -32,33 +30,17 @@ export class UsersService {
     return rows[0];
   }
 
-  // @routes /api/v1/users
-  // @method POST request
-  // @desc create new user
-  //   async create(createDto: CreateUserDto): Promise<User> {
-  //     const { error, value } = validateCreateUser(createDto);
-  //     if (error) {
-  //       return error.message;
-  //     }
-  //     const hash = await argon.hash(value.password);
-  //     const query = `
-  //           INSERT INTO user_entity(first_name, last_name, email, password)
-  //           VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING
-  //           RETURNING *
-  //       `;
-  //     const { rows } = await this.pgService.pool.query(query, [
-  //       value.first_name,
-  //       value.last_name,
-  //       value.email,
-  //       (value.password = hash),
-  //     ]);
-  //     return rows[0];
-  //   }
-
   // @routes /api/v1/users/:id
   // @method PUT request
   // @desc update user details with a given id
-  async update(id: string, updateDto: UpdateUserDto): Promise<User> {
+  async update(
+    id: string,
+    updateDto: UpdateUserDto,
+    user_id: string,
+  ): Promise<User> {
+    if (id !== user_id) {
+      throw new ForbiddenException('Unauthorized access'); // only the right user can update their account
+    }
     const { error, value } = validateUpdateUser(updateDto);
     if (error) {
       return error.message;
@@ -107,7 +89,10 @@ export class UsersService {
   // @routes /api/v1/users/:id
   // @method DELETE request
   // @desc delete user with a given id
-  async delete(id: string): Promise<void> {
+  async delete(id: string, user_id: string): Promise<void> {
+    if (id !== user_id) {
+      throw new ForbiddenException('Unauthorized access'); // only the right user can delete their account
+    }
     await this.pgService.pool.query('DELETE FROM user_entity WHERE id = $1', [
       id,
     ]);

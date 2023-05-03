@@ -2,7 +2,6 @@ import {
   Controller,
   Body,
   Get,
-  Post,
   Put,
   Delete,
   Param,
@@ -10,10 +9,11 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from 'src/interfaces/User.interface';
-import { CreateUserDto } from './dto/CreateUser.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
 
+@UseGuards(JwtGuard)
 @Controller('api/v1/users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
@@ -28,22 +28,20 @@ export class UsersController {
     return this.userService.findOne(id);
   }
 
-  //   @Post()
-  //   createUser(@Body() createDto: CreateUserDto): Promise<User> {
-  //     return this.userService.create(createDto);
-  //   }
-
-  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   updateUser(
     @Param('id') id: string,
     @Body() updateDto: UpdateUserDto,
+    @UserRequestObject() user: User,
   ): Promise<User> {
-    return this.userService.update(id, updateDto);
+    return this.userService.update(id, updateDto, user.id);
   }
 
   @Delete(':id')
-  deleteUser(@Param('id') id: string): Promise<void> {
-    return this.userService.delete(id);
+  deleteUser(
+    @Param('id') id: string,
+    @UserRequestObject() user: User,
+  ): Promise<void> {
+    return this.userService.delete(id, user.id);
   }
 }

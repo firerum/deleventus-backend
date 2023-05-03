@@ -7,57 +7,57 @@ import {
   Param,
   Body,
   UseGuards,
-  Req,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { UserEvent } from 'src/interfaces/UserEvent.interface';
 import { CreateEventDto } from './dto/CreateEvent.dto';
 import { UpdateEventDto } from './dto/UpdateEvent.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { User } from 'src/interfaces/User.interface';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
 
+@UseGuards(JwtGuard) // add the guard to the controller itself instead of individual endpoints
 @Controller('/api/v1/events')
 export class EventsController {
   constructor(private readonly eventService: EventsService) {}
 
-  @UseGuards(AuthGuard('jwt'))
   @Get()
-  findAllEvents(@Req() req: Request): Promise<UserEvent[]> {
-    const user: any = req.user;
+  findAllEvents(@UserRequestObject() user: User): Promise<UserEvent[]> {
+    console.log(user);
     return this.eventService.findAll(user.email);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   findOneEvent(@Param('id') id: string): Promise<UserEvent> {
     return this.eventService.findOne(id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   createEvent(
     @Body() createDto: CreateEventDto,
-    @Req() req: Request,
+    @UserRequestObject() user: User,
   ): Promise<UserEvent> {
-    const user: any = req.user;
     return this.eventService.create(createDto, user.email);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   updateEvent(
     @Param('id') id: string,
     @Body() updateDto: UpdateEventDto,
-    @Req() req: Request,
+    @UserRequestObject() user: User,
   ): Promise<UserEvent> {
-    const user: any = req.user;
     return this.eventService.update(id, updateDto, user.email);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  deleteEvent(@Param('id') id: string, @Req() req: Request): Promise<void> {
-    const user: any = req.user;
+  deleteEvent(
+    @Param('id') id: string,
+    @UserRequestObject() user: User,
+  ): Promise<void> {
     return this.eventService.delete(id, user.email);
   }
 }

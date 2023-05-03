@@ -41,6 +41,9 @@ export class UserEntity {
   @Column({ nullable: true })
   country: string;
 
+  @Column({ nullable: true })
+  avatar: string;
+
   @OneToMany(() => EventEntity, (eventEntity) => eventEntity.user)
   events: EventEntity[];
 

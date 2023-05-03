@@ -38,7 +38,7 @@ export class EventsService {
   // @routes /api/v1/events
   // @method POST request
   // @desc create new event
-  async create(createDto: CreateEventDto, email): Promise<UserEvent> {
+  async create(createDto: CreateEventDto, email: string): Promise<UserEvent> {
     const { error, value } = validateCreateEvent(createDto);
     if (error) {
       throw new ForbiddenException(error.message);
