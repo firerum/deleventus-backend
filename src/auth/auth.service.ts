@@ -3,7 +3,7 @@ import { AuthDto } from './dto/Auth.dto';
 import * as argon from 'argon2';
 import { PgService } from 'src/pg/pg.service';
 import { validateSignIn } from 'src/utils/validateUser';
-import { User } from 'src/interfaces/User.interface';
+import { User } from 'src/users/interface/User.interface';
 import { JwtService } from '@nestjs/jwt';
 import { validateCreateUser } from 'src/utils/validateUser';
 import { CreateUserDto } from 'src/users/dto/CreateUser.dto';

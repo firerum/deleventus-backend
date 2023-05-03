@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { User } from 'src/interfaces/User.interface';
+import { User } from 'src/users/interface/User.interface';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { validateUpdateUser } from 'src/utils/validateUser';
 import { PgService } from 'src/pg/pg.service';

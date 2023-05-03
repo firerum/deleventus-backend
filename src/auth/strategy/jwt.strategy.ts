@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PgService } from 'src/pg/pg.service';
-import { User } from 'src/interfaces/User.interface';
+import { User } from 'src/users/interface/User.interface';
 
 // This is where I do the configuration to extract the token from the request to verify if it is valid
 @Injectable()

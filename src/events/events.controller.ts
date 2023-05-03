@@ -11,10 +11,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
-import { UserEvent } from 'src/interfaces/UserEvent.interface';
+import { UserEvent } from 'src/events/interface/UserEvent.interface';
 import { CreateEventDto } from './dto/CreateEvent.dto';
 import { UpdateEventDto } from './dto/UpdateEvent.dto';
-import { User } from 'src/interfaces/User.interface';
+import { User } from 'src/users/interface/User.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
 
