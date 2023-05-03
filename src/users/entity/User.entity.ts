@@ -1,17 +1,9 @@
 import { EventEntity } from 'src/events/entity/Event.entity';
-import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  Generated,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class UserEntity {
-  @PrimaryGeneratedColumn()
-  @Generated('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ nullable: false })

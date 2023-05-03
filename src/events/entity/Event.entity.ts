@@ -3,15 +3,13 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  Generated,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
 
 @Entity()
 export class EventEntity {
-  @PrimaryGeneratedColumn()
-  @Generated('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ nullable: false })
@@ -37,8 +35,9 @@ export class EventEntity {
 
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.events)
   @JoinColumn({
-    name: 'user_email',
-    referencedColumnName: 'email',
+    name: 'user_id',
+    referencedColumnName: 'id',
+    foreignKeyConstraintName: 'fk_user_id',
   })
   user: UserEntity;
 
