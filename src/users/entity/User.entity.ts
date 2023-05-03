@@ -1,9 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn, Generated } from 'typeorm';
+import { EventEntity } from 'src/events/entity/Event.entity';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class UserEntity {
-  @PrimaryGeneratedColumn()
-  @Generated('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ nullable: false })
@@ -22,6 +22,9 @@ export class UserEntity {
   gender: string;
 
   @Column({ nullable: true })
+  username: string;
+
+  @Column({ nullable: true })
   phone_no: string;
 
   @Column({ nullable: true })
@@ -29,6 +32,12 @@ export class UserEntity {
 
   @Column({ nullable: true })
   country: string;
+
+  @Column({ nullable: true })
+  avatar: string;
+
+  @OneToMany(() => EventEntity, (eventEntity) => eventEntity.user)
+  events: EventEntity[];
 
   @Column({
     type: 'timestamptz',

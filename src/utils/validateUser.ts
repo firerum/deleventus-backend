@@ -1,4 +1,5 @@
 import * as Joi from 'joi';
+import { AuthDto } from 'src/auth/dto/Auth.dto';
 import { CreateUserDto } from 'src/users/dto/CreateUser.dto';
 import { UpdateUserDto } from 'src/users/dto/UpdateUser.dto';
 
@@ -9,7 +10,6 @@ export const validateCreateUser = (body: CreateUserDto): any => {
     last_name: Joi.string().lowercase().min(3).trim().required(),
     email: Joi.string().lowercase().email().min(3).trim().required(),
     password: Joi.string().min(6).required(),
-    confirm_password: Joi.string().min(6).required(),
     created_at: Joi.date().timestamp().default(new Date()),
   });
 
@@ -17,7 +17,7 @@ export const validateCreateUser = (body: CreateUserDto): any => {
 };
 
 // user login schema
-export const validateLogin = (body) => {
+export const validateSignIn = (body: AuthDto): any => {
   const schema = Joi.object({
     email: Joi.string().email().lowercase().min(3).trim().required(),
     password: Joi.string().required(),
