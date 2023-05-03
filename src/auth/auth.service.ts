@@ -60,12 +60,15 @@ export class AuthService {
     if (!validPassword) {
       throw new ForbiddenException('Password Incorrect!');
     }
-    return this.signToken(user.email);
+    return this.signToken(user.id, user.email);
   }
 
   // create token
-  async signToken(email: string): Promise<{ access_token: string }> {
-    const payload = { email };
+  async signToken(
+    id: string,
+    email: string,
+  ): Promise<{ access_token: string }> {
+    const payload = { id, email };
     const token = await this.jwt.signAsync(payload, {
       expiresIn: '15m',
       secret: this.config.get('JWT_SECRET'),

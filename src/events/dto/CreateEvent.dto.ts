@@ -19,7 +19,7 @@ export class CreateEventDto {
   @IsNotEmpty()
   readonly venue: string;
 
-  @IsDateString()
+  @IsString()
   @IsNotEmpty()
   readonly date_of_event: string;
 
