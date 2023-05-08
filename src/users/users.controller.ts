@@ -12,9 +12,11 @@ import { User } from 'src/users/interface/User.interface';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @UseGuards(JwtGuard)
-@Controller('api/v1/users')
+@Controller({ path: 'api/users', version: '1' }) // API versioning
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 

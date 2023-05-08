@@ -12,7 +12,7 @@ import { PgService } from 'src/pg/pg.service';
 export class EventsService {
   constructor(private readonly pgService: PgService) {}
 
-  // @routes /api/v1/events
+  // @routes /v1/api/events
   // @method GET request
   // @desc retrieve all events
   async findAll(user_id: string): Promise<UserEvent[]> {
@@ -23,7 +23,7 @@ export class EventsService {
     return rows;
   }
 
-  // @routes /api/v1/events/:id
+  // @routes /v1/api/events/:id
   // @method GET request
   // @desc retrieve event with a given id
   async findOne(id: string): Promise<UserEvent> {
@@ -35,7 +35,7 @@ export class EventsService {
     return rows[0];
   }
 
-  // @routes /api/v1/events
+  // @routes /v1/api/events
   // @method POST request
   // @desc create new event
   async create(createDto: CreateEventDto, user_id: string): Promise<UserEvent> {
@@ -62,7 +62,7 @@ export class EventsService {
     return rows[0];
   }
 
-  // @routes /api/v1/events/:id
+  // @routes /v1/api/events/:id
   // @method PUT request
   // @desc update event details with a given id
   async update(
@@ -112,7 +112,7 @@ export class EventsService {
     return rows[0];
   }
 
-  // @routes /api/v1/events/:id
+  // @routes /v1/api/events/:id
   // @method DELETE request
   // @desc delete event with a given id
   async delete(id: string, user_id: string): Promise<void> {

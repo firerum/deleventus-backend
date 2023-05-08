@@ -8,7 +8,7 @@ import { PgService } from 'src/pg/pg.service';
 export class UsersService {
   constructor(private readonly pgService: PgService) {}
 
-  // @routes /api/v1/users
+  // @routes /v1/api/users
   // @method GET request
   // @desc retrieve all users
   async findAll(): Promise<User[]> {
@@ -18,7 +18,7 @@ export class UsersService {
     return rows;
   }
 
-  // @routes /api/v1/users/:id
+  // @routes /v1/api/users/:id
   // @method GET request
   // @desc retrieve user with a given id
   async findOne(id: string): Promise<User> {
@@ -30,7 +30,7 @@ export class UsersService {
     return rows[0];
   }
 
-  // @routes /api/v1/users/:id
+  // @routes /v1/api/users/:id
   // @method PUT request
   // @desc update user details with a given id
   async update(
@@ -86,7 +86,7 @@ export class UsersService {
     return rows[0];
   }
 
-  // @routes /api/v1/users/:id
+  // @routes /v1/api/users/:id
   // @method DELETE request
   // @desc delete user with a given id
   async delete(id: string, user_id: string): Promise<void> {
