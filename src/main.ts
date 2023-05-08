@@ -24,7 +24,7 @@ async function bootstrap() {
     .setDescription('Deleventus App API')
     .setVersion('1.0.0')
     .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'Token' },
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'access_token',
     )
     .build();

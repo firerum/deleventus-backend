@@ -17,27 +17,34 @@ import { UpdateEventDto } from './dto/UpdateEvent.dto';
 import { User } from 'src/users/interface/User.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
-import { ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
-@ApiBearerAuth()
+@ApiTags('Events')
+@ApiBearerAuth('access_token')
 @UseGuards(JwtGuard) // add the guard to the controller itself instead of individual endpoints
 @Controller({ path: '/api/events', version: '1' })
 export class EventsController {
   constructor(private readonly eventService: EventsService) {}
 
-  @ApiCreatedResponse({ description: 'Get All Events' })
+  @ApiOkResponse({ description: 'Get All Events Succesful' })
   @Get()
   findAllEvents(@UserRequestObject() user: User): Promise<UserEvent[]> {
     return this.eventService.findAll(user.id);
   }
 
-  @ApiCreatedResponse({ description: 'Find Event By ID' })
+  @ApiOkResponse({ description: 'Find Event By ID Successful' })
   @Get(':id')
   findOneEvent(@Param('id') id: string): Promise<UserEvent> {
     return this.eventService.findOne(id);
   }
 
-  @ApiCreatedResponse({ description: 'Create New Event' })
+  @ApiCreatedResponse({ description: 'Event Create Successful' })
   @HttpCode(HttpStatus.CREATED)
   @Post()
   createEvent(
@@ -47,7 +54,7 @@ export class EventsController {
     return this.eventService.create(createDto, user.id);
   }
 
-  @ApiCreatedResponse({ description: 'Update Event' })
+  @ApiOkResponse({ description: 'Event Update Successful' })
   @Put(':id')
   updateEvent(
     @Param('id') id: string,
@@ -57,7 +64,7 @@ export class EventsController {
     return this.eventService.update(id, updateDto, user.id);
   }
 
-  @ApiCreatedResponse({ description: 'Delete Event' })
+  @ApiNoContentResponse({ description: 'Event Delete Successful' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   deleteEvent(

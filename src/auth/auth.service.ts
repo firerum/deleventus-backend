@@ -24,8 +24,8 @@ export class AuthService {
     }
     const hash = await argon.hash(value.password);
     const query = `
-          INSERT INTO user_entity(first_name, last_name, email, password)
-          VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING
+          INSERT INTO user_entity(first_name, last_name, email, password, username, gender, phone_no, avatar, country)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (email) DO NOTHING
           RETURNING *
       `;
     const { rows } = await this.pgService.pool.query(query, [
@@ -33,6 +33,11 @@ export class AuthService {
       value.last_name,
       value.email,
       (value.password = hash),
+      value.username,
+      value.gender,
+      value.phone_no,
+      value.avatar,
+      value.country,
     ]);
     return rows[0];
   }

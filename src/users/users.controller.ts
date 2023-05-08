@@ -12,9 +12,10 @@ import { User } from 'src/users/interface/User.interface';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-@ApiBearerAuth()
+@ApiTags('Users')
+@ApiBearerAuth('access_token')
 @UseGuards(JwtGuard)
 @Controller({ path: 'api/users', version: '1' }) // API versioning
 export class UsersController {

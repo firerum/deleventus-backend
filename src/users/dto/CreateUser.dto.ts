@@ -8,22 +8,26 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUserDto {
-  @ApiProperty({ type: String, description: 'first_name' })
+  @ApiProperty({ type: String, description: 'first_name', default: 'John' })
   @IsString()
   @IsNotEmpty()
   readonly first_name: string;
 
-  @ApiProperty({ type: String, description: 'last_name' })
+  @ApiProperty({ type: String, description: 'last_name', default: 'Doe' })
   @IsString()
   @IsNotEmpty()
   readonly last_name: string;
 
-  @ApiProperty({ type: String, description: 'email' })
+  @ApiProperty({
+    type: String,
+    description: 'email',
+    default: 'johndoe@gmail.com',
+  })
   @IsEmail()
   @IsNotEmpty()
   readonly email: string;
 
-  @ApiProperty({ type: String, description: 'password' })
+  @ApiProperty({ type: String, description: 'password', default: '123456' })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
