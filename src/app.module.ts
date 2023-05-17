@@ -14,6 +14,10 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { PgModule } from './pg/pg.module';
 import { JwtService } from '@nestjs/jwt';
+import { CommentsModule } from './comments/comments.module';
+import { CommentEntity } from './comments/entity/Comment.entity';
+import { CommentsController } from './comments/comments.controller';
+import { CommentsService } from './comments/comments.service';
 
 @Module({
   imports: [
@@ -22,6 +26,7 @@ import { JwtService } from '@nestjs/jwt';
     EventsModule,
     AuthModule,
     PgModule,
+    CommentsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -31,14 +36,25 @@ import { JwtService } from '@nestjs/jwt';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [UserEntity, EventEntity],
+        entities: [UserEntity, EventEntity, CommentEntity],
         synchronize: true,
       }),
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([UserEntity, EventEntity]),
   ],
-  controllers: [UsersController, EventsController, AuthController],
-  providers: [UsersService, EventsService, AuthService, JwtService],
+  controllers: [
+    UsersController,
+    EventsController,
+    AuthController,
+    CommentsController,
+  ],
+  providers: [
+    UsersService,
+    EventsService,
+    AuthService,
+    JwtService,
+    CommentsService,
+  ],
 })
 export class AppModule {}

@@ -1,9 +1,11 @@
+import { CommentEntity } from 'src/comments/entity/Comment.entity';
 import { UserEntity } from 'src/users/entity/User.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 
@@ -40,6 +42,11 @@ export class EventEntity {
     foreignKeyConstraintName: 'fk_user_id',
   })
   user: UserEntity;
+
+  @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.event, {
+    onDelete: 'CASCADE',
+  })
+  comments: CommentEntity[];
 
   @Column({
     type: 'timestamptz',
