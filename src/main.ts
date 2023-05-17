@@ -11,6 +11,9 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
 
+  // accept cross origin
+  app.enableCors();
+
   // this is to use class validators on my DTOs and remove unwanted properties that may be passed
   app.useGlobalPipes(
     new ValidationPipe({

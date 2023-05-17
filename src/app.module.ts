@@ -36,6 +36,7 @@ import { JwtService } from '@nestjs/jwt';
       }),
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([UserEntity, EventEntity]),
   ],
   controllers: [UsersController, EventsController, AuthController],
   providers: [UsersService, EventsService, AuthService, JwtService],

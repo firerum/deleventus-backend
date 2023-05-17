@@ -39,10 +39,11 @@ export class AuthService {
       value.avatar,
       value.country,
     ]);
-    return rows[0];
+    const { access_token } = await this.signToken(rows[0].id, rows[0].email);
+    return { ...rows[0], token: access_token };
   }
 
-  async signin(auth: AuthDto): Promise<{ access_token: string }> {
+  async signin(auth: AuthDto): Promise<User> {
     const { error, value } = validateSignIn(auth);
     if (error) {
       return error.message;
@@ -65,7 +66,8 @@ export class AuthService {
     if (!validPassword) {
       throw new ForbiddenException('Password Incorrect!');
     }
-    return this.signToken(user.id, user.email);
+    const { access_token } = await this.signToken(user.id, user.email);
+    return { ...rows[0], token: access_token };
   }
 
   // create token
