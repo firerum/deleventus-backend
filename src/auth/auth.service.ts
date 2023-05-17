@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { AuthDto } from './dto/Auth.dto';
 import * as argon from 'argon2';
 import { PgService } from 'src/pg/pg.service';
@@ -22,6 +27,24 @@ export class AuthService {
     if (error) {
       return error.message;
     }
+
+    // check if user already exists
+    const search = `
+         SELECT * FROM user_entity
+         WHERE email = $1
+       `;
+    const { rows: rowObj } = await this.pgService.pool.query(search, [
+      value.email,
+    ]);
+    const [user]: [User] = rowObj;
+    // throw error message if user exists
+    if (user) {
+      throw new HttpException(
+        'User Exists, Please Sign In!',
+        HttpStatus.CONFLICT,
+      );
+    }
+
     const hash = await argon.hash(value.password);
     const query = `
           INSERT INTO user_entity(first_name, last_name, email, password, username, gender, phone_no, avatar, country)
