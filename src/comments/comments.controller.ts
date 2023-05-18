@@ -22,6 +22,11 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 
+  @Get()
+  findAllComments(): Promise<Comment> {
+    return this.commentService.findAll();
+  }
+
   @Post()
   createComment(
     @Body() createCommentDto: CreateCommentDto,
@@ -30,8 +35,12 @@ export class CommentsController {
     return this.commentService.create(createCommentDto, user.id);
   }
 
-  @Put()
-  updateComment(): string {
-    return this.commentService.update();
+  @Put(':id')
+  updateComment(
+    @Body() updateCommentDto: CreateCommentDto,
+    @Param('id') id: string,
+    @UserRequestObject() user: User,
+  ): Promise<Comment> {
+    return this.commentService.update(updateCommentDto, user.id, id);
   }
 }

@@ -80,14 +80,14 @@ export class AuthService {
     const [user]: [User] = rows;
     // throw error message if user does not exist
     if (!user) {
-      throw new ForbiddenException('User does not exist');
+      throw new HttpException('User does not exist', HttpStatus.UNAUTHORIZED);
     }
 
     // compare password if user exists
     const validPassword = await argon.verify(user.password, auth.password);
     // throw error message on password mismatch
     if (!validPassword) {
-      throw new ForbiddenException('Password Incorrect!');
+      throw new HttpException('Password Incorrect!', HttpStatus.UNAUTHORIZED);
     }
     const { access_token } = await this.signToken(user.id, user.email);
     return { ...rows[0], token: access_token };
