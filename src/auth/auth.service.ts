@@ -63,7 +63,7 @@ export class AuthService {
       value.country,
     ]);
     const { access_token } = await this.signToken(rows[0].id, rows[0].email);
-    return { ...rows[0], token: access_token };
+    return { ...rows[0], password: '', token: access_token };
   }
 
   async signin(auth: AuthDto): Promise<User> {
@@ -90,7 +90,7 @@ export class AuthService {
       throw new HttpException('Password Incorrect!', HttpStatus.UNAUTHORIZED);
     }
     const { access_token } = await this.signToken(user.id, user.email);
-    return { ...rows[0], token: access_token };
+    return { ...rows[0], password: '', token: access_token };
   }
 
   // create token

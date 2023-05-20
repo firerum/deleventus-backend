@@ -15,7 +15,13 @@ export class UsersService {
     const { rows } = await this.pgService.pool.query(
       'SELECT * FROM user_entity',
     );
-    return rows;
+    // set the passwords to empty string
+    const newRows = rows.map((row) => {
+      row.password = '';
+      return row;
+    });
+
+    return newRows;
   }
 
   // @routes /v1/api/users/:id
@@ -27,7 +33,7 @@ export class UsersService {
          WHERE id = $1
        `;
     const { rows } = await this.pgService.pool.query(query, [id]);
-    return rows[0];
+    return { ...rows[0], password: '' };
   }
 
   // @routes /v1/api/users/:id
@@ -83,7 +89,7 @@ export class UsersService {
       updated_at,
       id,
     ]);
-    return rows[0];
+    return { ...rows[0], password: '' };
   }
 
   // @routes /v1/api/users/:id
