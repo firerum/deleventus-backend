@@ -47,6 +47,9 @@ export class UserEntity {
   })
   comments: CommentEntity[];
 
+  @Column({ nullable: true })
+  refresh_token: string;
+
   @Column({
     type: 'timestamptz',
     nullable: false,

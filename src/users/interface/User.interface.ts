@@ -16,4 +16,5 @@ export interface User {
   avatar?: string;
   country?: string;
   city?: string;
+  refresh_token?: string;
 }
