@@ -16,7 +16,9 @@ export class CommentEntity {
   @Column({ nullable: false })
   comment: string;
 
-  @ManyToOne(() => UserEntity, (userEntity) => userEntity.comments)
+  @ManyToOne(() => UserEntity, (userEntity) => userEntity.comments, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({
     name: 'user_id',
     referencedColumnName: 'id',
@@ -24,7 +26,9 @@ export class CommentEntity {
   })
   user: UserEntity;
 
-  @ManyToOne(() => EventEntity, (eventEntity) => eventEntity.comments)
+  @ManyToOne(() => EventEntity, (eventEntity) => eventEntity.comments, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({
     name: 'event_id',
     referencedColumnName: 'id',

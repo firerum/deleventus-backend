@@ -30,7 +30,12 @@ export class EventsService {
       'SELECT * FROM event_entity WHERE owner_id = $1',
       [user_id],
     );
-    return rows;
+    const result = rows.map(async (e: UserEvent) => {
+      const comments = await this.commentService.findAll(e.id);
+      e.comments = comments;
+    });
+    await Promise.all(result);
+    return rows; // TODO figure out how rows contain the comments
   }
 
   // @routes /v1/api/events/:id
@@ -42,12 +47,12 @@ export class EventsService {
          WHERE id = $1 AND owner_id = $2
        `;
     const { rows } = await this.pgService.pool.query(query, [id, user_id]);
-    if (rows.length < 1) {
-      return null;
-    }
-    // return events with comments if extant
-    const comments = await this.commentService.findAll(id);
-    return { ...rows[0], comments };
+    const result = rows.map(async (e: UserEvent) => {
+      const comments = await this.commentService.findAll(id);
+      e.comments = comments;
+    });
+    await Promise.all(result);
+    return rows[0];
   }
 
   // @routes /v1/api/events
@@ -137,7 +142,7 @@ export class EventsService {
        `;
     const { rows } = await this.pgService.pool.query(query, [id]);
     const [event]: [UserEvent] = rows;
-    if (event.owner_id !== user_id) {
+    if (event?.owner_id !== user_id) {
       throw new ForbiddenException('Unauthorized access');
     }
     await this.pgService.pool.query('DELETE FROM event_entity WHERE id = $1', [

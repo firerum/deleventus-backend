@@ -12,8 +12,8 @@ export class CreateCommentDto {
   @IsNotEmpty()
   readonly event_id: string;
 
-  @ApiProperty({ type: String, description: 'user_id' })
-  @IsString()
-  @IsNotEmpty()
-  readonly user_id: string;
+  //   @ApiProperty({ type: String, description: 'user_id' })
+  //   @IsString()
+  //   @IsNotEmpty()
+  //   readonly user_id: string;
 }
