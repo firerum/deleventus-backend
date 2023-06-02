@@ -98,7 +98,7 @@ export class AuthService {
     }
 
     // compare password if user exists
-    const validPassword = await argon.verify(user.password, auth.password);
+    const validPassword = await argon.verify(user.password, value.password);
     // throw error message on password mismatch
     if (!validPassword) {
       throw new HttpException('Password Incorrect!', HttpStatus.UNAUTHORIZED);

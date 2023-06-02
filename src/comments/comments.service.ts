@@ -42,7 +42,6 @@ export class CommentsService {
     id: string,
   ): Promise<Comment> {
     const { comment } = updateDto;
-    const event_id = '9174759e-8b56-4ec3-9f1e-e22d6d99f1b8';
     const { rows: commentObject } = await this.pgService.pool.query(
       'SELECT * FROM comment_entity WHERE id = $1',
       [id],
@@ -51,14 +50,10 @@ export class CommentsService {
       throw new ForbiddenException('Unauthorized Access');
     }
     const query = `
-        UPDATE comment_entity SET comment = $1 WHERE user_id = $2 AND event_id = $3
+        UPDATE comment_entity SET comment = $1 WHERE id = $2
         RETURNING *
     `;
-    const { rows } = await this.pgService.pool.query(query, [
-      comment,
-      userId,
-      event_id,
-    ]);
+    const { rows } = await this.pgService.pool.query(query, [comment, id]);
     return rows[0];
   }
 }
