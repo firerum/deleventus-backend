@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PgService } from 'src/pg/pg.service';
+import { EventsService } from 'src/events/events.service';
 import { User } from 'src/users/interface/User.interface';
 
 // This is where I do the configuration to extract the token from the request to verify if it is valid
@@ -11,10 +12,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     readonly config: ConfigService,
     private readonly pgService: PgService,
+    private readonly EventService: EventsService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // extract token
-      ignoreExpiration: false, // makes token invalid after expiration
+      ignoreExpiration: true, // makes token invalid after expiration
       secretOrKey: config.get('JWT_SECRET'), // the secret to sign the token
     });
   }
@@ -30,6 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       'SELECT * FROM user_entity WHERE email = $1',
       [payload.email],
     );
-    return rows[0];
+    const events = await this.EventService.findAll(payload.id);
+    return { ...rows[0], events };
   }
 }

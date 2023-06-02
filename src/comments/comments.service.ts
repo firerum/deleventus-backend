@@ -7,8 +7,7 @@ import { PgService } from 'src/pg/pg.service';
 export class CommentsService {
   constructor(private readonly pgService: PgService) {}
 
-  async findAll(): Promise<Comment> {
-    const event_id = '9174759e-8b56-4ec3-9f1e-e22d6d99f1b8';
+  async findAll(event_id: string): Promise<Comment[]> {
     const query = `
         SELECT * FROM comment_entity WHERE event_id = $1
     `;
@@ -20,8 +19,7 @@ export class CommentsService {
   // @method POST request
   // @desc create new comment
   async create(createDto: CreateCommentDto, userId: string): Promise<Comment> {
-    const { comment, event_id = '9174759e-8b56-4ec3-9f1e-e22d6d99f1b8' } =
-      createDto;
+    const { comment, event_id } = createDto;
     const query = `
           INSERT INTO comment_entity(comment, event_id, user_id)
           VALUES ($1, $2, $3) 

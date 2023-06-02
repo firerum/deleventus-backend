@@ -3,10 +3,14 @@ import { User } from 'src/users/interface/User.interface';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { validateUpdateUser } from 'src/utils/validateUser';
 import { PgService } from 'src/pg/pg.service';
+import { EventsService } from 'src/events/events.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly pgService: PgService) {}
+  constructor(
+    private readonly pgService: PgService,
+    private readonly eventService: EventsService,
+  ) {}
 
   // @routes /v1/api/users
   // @method GET request
@@ -33,7 +37,8 @@ export class UsersService {
          WHERE id = $1
        `;
     const { rows } = await this.pgService.pool.query(query, [id]);
-    return { ...rows[0], password: '' };
+    const events = await this.eventService.findAll(id);
+    return { ...rows[0], password: '', events };
   }
 
   // @routes /v1/api/users/:id

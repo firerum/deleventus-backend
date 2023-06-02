@@ -23,8 +23,9 @@ export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 
   @Get()
-  findAllComments(): Promise<Comment> {
-    return this.commentService.findAll();
+  async findAllComments(): Promise<Comment[]> {
+    const event_id = '9174759e-8b56-4ec3-9f1e-e22d6d99f1b8';
+    return this.commentService.findAll(event_id);
   }
 
   @Post()
