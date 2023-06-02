@@ -3,10 +3,14 @@ import { User } from 'src/users/interface/User.interface';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { validateUpdateUser } from 'src/utils/validateUser';
 import { PgService } from 'src/pg/pg.service';
+import { EventsService } from 'src/events/events.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly pgService: PgService) {}
+  constructor(
+    private readonly pgService: PgService,
+    private readonly eventService: EventsService,
+  ) {}
 
   // @routes /v1/api/users
   // @method GET request
@@ -15,13 +19,13 @@ export class UsersService {
     const { rows } = await this.pgService.pool.query(
       'SELECT * FROM user_entity',
     );
-    // set the passwords to empty string
-    const newRows = rows.map((row) => {
-      row.password = '';
-      return row;
+    const result = rows.map(async (user: User) => {
+      const events = await this.eventService.findAll(user.id);
+      user.events = events;
+      user.password = '';
     });
-
-    return newRows;
+    await Promise.all(result);
+    return rows;
   }
 
   // @routes /v1/api/users/:id
@@ -33,7 +37,13 @@ export class UsersService {
          WHERE id = $1
        `;
     const { rows } = await this.pgService.pool.query(query, [id]);
-    return { ...rows[0], password: '' };
+    const result = rows.map(async (user: User) => {
+      const events = await this.eventService.findAll(user.id);
+      user.events = events;
+      user.password = '';
+    });
+    await Promise.all(result);
+    return rows[0];
   }
 
   // @routes /v1/api/users/:id

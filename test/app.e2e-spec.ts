@@ -15,7 +15,7 @@ afterAll(async () => {
     'kaindoe@example.com',
   ]);
 
-  await pg.pool.query('DELETE FROM event_entity WHERE user_id = $1', [userId]);
+  await pg.pool.query('DELETE FROM event_entity WHERE owner_id = $1', [userId]);
 
   pg.pool.end();
 });
@@ -83,7 +83,7 @@ describe('AppController (e2e)', () => {
           date_of_event: '2',
           description: 'this is a test event.',
           visibility: 'private',
-          user_id: userId,
+          owner_id: userId,
         })
         .set('Authorization', `Bearer ${token}`);
       eventId = response.body.id;
@@ -113,6 +113,7 @@ describe('AppController (e2e)', () => {
       expect(response.body).toHaveProperty('id');
       expect(response.body).toHaveProperty('name');
       expect(response.body).toHaveProperty('description');
+      expect(response.body.comments).toBeInstanceOf(Array);
     });
 
     it('should update an event (PUT)', async () => {
@@ -160,6 +161,7 @@ describe('AppController (e2e)', () => {
       expect(response.body).toHaveProperty('id');
       expect(response.body).toHaveProperty('first_name');
       expect(response.body).toHaveProperty('email');
+      expect(response.body.events).toBeInstanceOf(Array);
     });
 
     it('should update the user (PUT)', async () => {

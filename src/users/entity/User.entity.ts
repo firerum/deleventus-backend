@@ -37,6 +37,9 @@ export class UserEntity {
   @Column({ nullable: true })
   avatar: string;
 
+  @Column({ nullable: true, default: false })
+  verified: boolean;
+
   @OneToMany(() => EventEntity, (eventEntity) => eventEntity.user, {
     onDelete: 'CASCADE',
   })
@@ -46,6 +49,9 @@ export class UserEntity {
     onDelete: 'CASCADE',
   })
   comments: CommentEntity[];
+
+  @Column({ nullable: true })
+  refresh_token: string;
 
   @Column({
     type: 'timestamptz',

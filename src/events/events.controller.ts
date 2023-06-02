@@ -40,8 +40,11 @@ export class EventsController {
 
   @ApiOkResponse({ description: 'Find Event By ID Successful' })
   @Get(':id')
-  findOneEvent(@Param('id') id: string): Promise<UserEvent> {
-    return this.eventService.findOne(id);
+  findOneEvent(
+    @Param('id') id: string,
+    @UserRequestObject() user: User,
+  ): Promise<UserEvent> {
+    return this.eventService.findOne(id, user.id);
   }
 
   @ApiCreatedResponse({ description: 'Event Create Successful' })

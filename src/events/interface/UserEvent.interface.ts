@@ -1,3 +1,5 @@
+import { Comment } from 'src/comments/interface/comment.interface';
+
 export enum Visibilty {
   public,
   private,
@@ -18,6 +20,7 @@ export interface UserEvent {
   description: string;
   visibility: Visibilty;
   avatar: string;
+  comments?: Comment[];
   updated_at?: string;
-  user_id?: string;
+  owner_id?: string;
 }

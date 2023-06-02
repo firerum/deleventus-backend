@@ -22,6 +22,9 @@ export class AuthService {
     private readonly config: ConfigService,
   ) {}
 
+  // @routes /v1/api/auth/signup
+  // @method POST request
+  // @desc create new user
   async signup(auth: CreateUserDto): Promise<User> {
     const { error, value } = validateCreateUser(auth);
     if (error) {
@@ -62,10 +65,21 @@ export class AuthService {
       value.avatar,
       value.country,
     ]);
-    const { access_token } = await this.signToken(rows[0].id, rows[0].email);
-    return { ...rows[0], password: '', token: access_token };
+    const { access_token } = await this.signAccessToken(
+      rows[0].id,
+      rows[0].email,
+    );
+    const { refresh_token } = await this.signRefreshToken(
+      rows[0].id,
+      rows[0].email,
+    );
+    await this.updateRefreshToken(rows[0].id, refresh_token);
+    return { ...rows[0], password: '', token: access_token, refresh_token };
   }
 
+  // @routes /v1/api/auth/signin
+  // @method POST request
+  // @desc sign in user
   async signin(auth: AuthDto): Promise<User> {
     const { error, value } = validateSignIn(auth);
     if (error) {
@@ -84,17 +98,56 @@ export class AuthService {
     }
 
     // compare password if user exists
-    const validPassword = await argon.verify(user.password, auth.password);
+    const validPassword = await argon.verify(user.password, value.password);
     // throw error message on password mismatch
     if (!validPassword) {
       throw new HttpException('Password Incorrect!', HttpStatus.UNAUTHORIZED);
     }
-    const { access_token } = await this.signToken(user.id, user.email);
-    return { ...rows[0], password: '', token: access_token };
+    const { access_token } = await this.signAccessToken(user.id, user.email);
+    const { refresh_token } = await this.signRefreshToken(user.id, user.email);
+    await this.updateRefreshToken(user.id, refresh_token);
+    return { ...rows[0], password: '', token: access_token, refresh_token };
   }
 
-  // create token
-  async signToken(
+  // @routes /v1/api/auth/signout
+  // @method GET request
+  // @desc sign out user
+  async signOut(user_id: string): Promise<void> {
+    const query = `
+        UPDATE user_entity SET refresh_token = NULL WHERE id = $1
+    `;
+    await this.pgService.pool.query(query, [user_id]);
+  }
+
+  // @routes /v1/api/auth/refresh
+  // @method GET request
+  // @desc generate new refresh token for user
+  async refresh(
+    user_id: string,
+    refresh: string,
+  ): Promise<{ token: string; refresh_token: string }> {
+    const query = `
+        SELECT * FROM user_entity WHERE id = $1
+    `;
+    const { rows } = await this.pgService.pool.query(query, [user_id]);
+    const [user]: [User] = rows;
+    if (!user || !user.refresh_token) {
+      throw new ForbiddenException('Access Denied');
+    }
+    // compare if tokens match
+    const validRefreshToken = await argon.verify(user.refresh_token, refresh);
+    if (!validRefreshToken) {
+      throw new ForbiddenException("Access Denied. Tokens don't match");
+    }
+    const { access_token } = await this.signAccessToken(user.id, user.email);
+    const { refresh_token } = await this.signRefreshToken(user.id, user.email);
+    await this.updateRefreshToken(user.id, refresh_token);
+    return { token: access_token, refresh_token };
+  }
+
+  // helper functions for creating/modifying tokens
+  // create access token
+  async signAccessToken(
     id: string,
     email: string,
   ): Promise<{ access_token: string }> {
@@ -104,5 +157,33 @@ export class AuthService {
       secret: this.config.get('JWT_SECRET'),
     });
     return { access_token: token };
+  }
+
+  // create refresh token
+  async signRefreshToken(
+    id: string,
+    email: string,
+  ): Promise<{ refresh_token: string }> {
+    const payload = { id, email };
+    const refreshToken = await this.jwt.signAsync(payload, {
+      expiresIn: '7d',
+      secret: this.config.get('JWT_REFRESH_SECRET'),
+    });
+    return { refresh_token: refreshToken };
+  }
+
+  // update refresh token
+  async updateRefreshToken(
+    user_id: string,
+    refresh_token: string,
+  ): Promise<void> {
+    const hashedRefreshToken = await argon.hash(refresh_token);
+    const query = `
+        UPDATE user_entity SET refresh_token = $1 WHERE id = $2 
+    `;
+    await this.pgService.pool.query(query, [
+      (refresh_token = hashedRefreshToken),
+      user_id,
+    ]);
   }
 }

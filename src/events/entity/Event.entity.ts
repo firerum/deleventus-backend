@@ -37,9 +37,9 @@ export class EventEntity {
 
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.events)
   @JoinColumn({
-    name: 'user_id',
+    name: 'owner_id',
     referencedColumnName: 'id',
-    foreignKeyConstraintName: 'fk_user_id',
+    foreignKeyConstraintName: 'fk_owner_id',
   })
   user: UserEntity;
 

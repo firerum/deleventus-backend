@@ -1,3 +1,5 @@
+import { UserEvent } from 'src/events/interface/UserEvent.interface';
+
 export enum Gender {
   male,
   female,
@@ -16,4 +18,7 @@ export interface User {
   avatar?: string;
   country?: string;
   city?: string;
+  events: UserEvent[];
+  verified: boolean;
+  refresh_token?: string;
 }
