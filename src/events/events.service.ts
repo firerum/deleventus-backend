@@ -1,6 +1,5 @@
 import {
   ForbiddenException,
-  HttpCode,
   HttpException,
   HttpStatus,
   Injectable,
@@ -61,7 +60,7 @@ export class EventsService {
   async create(createDto: CreateEventDto, user_id: string): Promise<UserEvent> {
     const { error, value } = validateCreateEvent(createDto);
     if (error) {
-      throw new ForbiddenException(error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
     const { name, category, venue, date_of_event, description, visibility } =
       value;
@@ -92,7 +91,7 @@ export class EventsService {
   ): Promise<UserEvent> {
     const { error, value } = validateUpdateEvent(updateDto);
     if (error) {
-      throw new ForbiddenException(error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
     const {
       name,

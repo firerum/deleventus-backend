@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { CreateCommentDto } from './dto/Comment.dto';
+import { CreateCommentDto, UpdateCommentDto } from './dto/Comment.dto';
 import { User } from 'src/users/interface/User.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
@@ -38,7 +38,7 @@ export class CommentsController {
 
   @Put(':id')
   updateComment(
-    @Body() updateCommentDto: CreateCommentDto,
+    @Body() updateCommentDto: UpdateCommentDto,
     @Param('id') id: string,
     @UserRequestObject() user: User,
   ): Promise<Comment> {
