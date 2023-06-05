@@ -24,7 +24,7 @@ export class AttendeesService {
   async create(
     event_id: string,
     createAttendeeDto: CreateAttendeeDto,
-    user_id,
+    user_id: string,
   ): Promise<Attendee> {
     const { status } = createAttendeeDto;
     const query = `

@@ -1,4 +1,5 @@
 import { Comment } from 'src/comments/interface/comment.interface';
+import { Attendee } from 'src/attendees/interface/Attendee.interface';
 
 export enum Visibilty {
   PUBLIC = 'public',
@@ -9,7 +10,7 @@ export enum Category {
   WEDDING = 'wedding',
   BIRTHDAY = 'birthday',
   CONVOCATION = 'convocation',
-  OTHER = 'other',
+  OTHERS = 'others',
 }
 
 export interface UserEvent {
@@ -22,6 +23,7 @@ export interface UserEvent {
   visibility: Visibilty;
   avatar: string;
   comments?: Comment[];
+  attendees?: Attendee[];
   updated_at?: string;
   owner_id?: string;
 }

@@ -13,12 +13,14 @@ import {
 } from 'src/utils/validateEvent';
 import { PgService } from 'src/pg/pg.service';
 import { CommentsService } from 'src/comments/comments.service';
+import { AttendeesService } from 'src/attendees/attendees.service';
 
 @Injectable()
 export class EventsService {
   constructor(
     private readonly pgService: PgService,
     private readonly commentService: CommentsService,
+    private readonly attendeeService: AttendeesService,
   ) {}
 
   // @routes /v1/api/events
@@ -31,7 +33,9 @@ export class EventsService {
     );
     const result = rows.map(async (e: UserEvent) => {
       const comments = await this.commentService.findAll(e.id);
+      const attendees = await this.attendeeService.findAll(e.id);
       e.comments = comments;
+      e.attendees = attendees;
     });
     await Promise.all(result);
     return rows; // TODO figure out how rows contain the comments
@@ -48,7 +52,9 @@ export class EventsService {
     const { rows } = await this.pgService.pool.query(query, [id, user_id]);
     const result = rows.map(async (e: UserEvent) => {
       const comments = await this.commentService.findAll(id);
+      const attendees = await this.attendeeService.findAll(e.id);
       e.comments = comments;
+      e.attendees = attendees;
     });
     await Promise.all(result);
     return rows[0];
