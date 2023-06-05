@@ -10,7 +10,6 @@ export const validateCreateComment = (
 ): Joi.ValidationResult<CreateCommentDto> => {
   const schema = Joi.object({
     comment: Joi.string().trim().lowercase().required(),
-    event_id: Joi.string().trim().lowercase().required(),
     created_at: Joi.date().timestamp().default(new Date()),
   });
 

@@ -27,9 +27,13 @@ export class CommentsService {
   // @routes /v1/api/comments
   // @method POST request
   // @desc create new comment
-  async create(createDto: CreateCommentDto, userId: string): Promise<Comment> {
+  async create(
+    createDto: CreateCommentDto,
+    userId: string,
+    event_id: string,
+  ): Promise<Comment> {
     const {
-      value: { comment, event_id },
+      value: { comment },
       error,
     } = validateCreateComment(createDto);
     if (error) {
