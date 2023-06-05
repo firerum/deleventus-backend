@@ -4,8 +4,10 @@ import {
   IsEmail,
   IsOptional,
   MinLength,
+  IsEnum,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Gender } from '../interface/User.interface';
 
 export class CreateUserDto {
   @ApiProperty({ type: String, description: 'first_name', default: 'John' })
@@ -38,8 +40,8 @@ export class CreateUserDto {
   @IsOptional()
   readonly username?: string;
 
-  @ApiPropertyOptional({ type: String, description: 'gender' })
-  @IsString()
+  @ApiPropertyOptional({ enum: Gender, description: 'gender' })
+  @IsEnum(Gender)
   @IsOptional()
   readonly gender?: string;
 

@@ -24,7 +24,7 @@ export class CommentsService {
     return rows;
   }
 
-  // @routes /v1/api/comments
+  // @routes /v1/api/events/:event_id/comments
   // @method POST request
   // @desc create new comment
   async create(

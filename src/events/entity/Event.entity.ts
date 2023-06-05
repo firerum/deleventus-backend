@@ -1,5 +1,7 @@
 import { CommentEntity } from 'src/comments/entity/Comment.entity';
 import { UserEntity } from 'src/users/entity/User.entity';
+import { AttendeeEntity } from 'src/attendees/entity/Attendee.entity';
+import { Visibilty, Category } from '../interface/UserEvent.interface';
 import {
   Column,
   Entity,
@@ -17,8 +19,8 @@ export class EventEntity {
   @Column({ nullable: false })
   name: string;
 
-  @Column({ nullable: false })
-  category: string;
+  @Column({ type: 'enum', enum: Category, default: Category.WEDDING })
+  category: Category;
 
   @Column({ nullable: false })
   venue: string;
@@ -29,8 +31,8 @@ export class EventEntity {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ nullable: true, default: 'public' })
-  visibility: string;
+  @Column({ type: 'enum', enum: Visibilty, default: Visibilty.PUBLIC })
+  visibility: Visibilty;
 
   @Column({ nullable: true })
   avatar: string;
@@ -47,6 +49,9 @@ export class EventEntity {
     onDelete: 'CASCADE',
   })
   comments: CommentEntity[];
+
+  @OneToMany(() => AttendeeEntity, (attendeeEntity) => attendeeEntity.event)
+  attendees: AttendeeEntity[];
 
   @Column({
     type: 'timestamptz',

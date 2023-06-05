@@ -1,14 +1,15 @@
 import { Comment } from 'src/comments/interface/comment.interface';
 
 export enum Visibilty {
-  public,
-  private,
+  PUBLIC = 'public',
+  PRIVATE = 'private',
 }
 
 export enum Category {
-  wedding,
-  birthday,
-  other,
+  WEDDING = 'wedding',
+  BIRTHDAY = 'birthday',
+  CONVOCATION = 'convocation',
+  OTHER = 'other',
 }
 
 export interface UserEvent {
