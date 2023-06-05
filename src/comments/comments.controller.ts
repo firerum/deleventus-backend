@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { CreateCommentDto } from './dto/Comment.dto';
+import { CreateCommentDto, UpdateCommentDto } from './dto/Comment.dto';
 import { User } from 'src/users/interface/User.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
@@ -18,13 +18,14 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiTags('Comments')
 @ApiBearerAuth('access_token')
 @UseGuards(JwtGuard)
-@Controller({ path: '/api/comments', version: '1' })
+@Controller({ path: '/api/events/:event_id/comments', version: '1' })
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 
   @Get()
-  async findAllComments(): Promise<Comment[]> {
-    const event_id = '9174759e-8b56-4ec3-9f1e-e22d6d99f1b8';
+  async findAllComments(
+    @Param('event_id') event_id: string,
+  ): Promise<Comment[]> {
     return this.commentService.findAll(event_id);
   }
 
@@ -32,13 +33,14 @@ export class CommentsController {
   createComment(
     @Body() createCommentDto: CreateCommentDto,
     @UserRequestObject() user: User,
+    @Param('event_id') event_id: string,
   ): Promise<Comment> {
-    return this.commentService.create(createCommentDto, user.id);
+    return this.commentService.create(createCommentDto, user.id, event_id);
   }
 
   @Put(':id')
   updateComment(
-    @Body() updateCommentDto: CreateCommentDto,
+    @Body() updateCommentDto: UpdateCommentDto,
     @Param('id') id: string,
     @UserRequestObject() user: User,
   ): Promise<Comment> {
