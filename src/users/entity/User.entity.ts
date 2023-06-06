@@ -1,6 +1,8 @@
 import { CommentEntity } from 'src/comments/entity/Comment.entity';
 import { EventEntity } from 'src/events/entity/Event.entity';
+import { AttendeeEntity } from 'src/attendees/entity/Attendee.entity';
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Gender } from '../interface/User.interface';
 
 @Entity()
 export class UserEntity {
@@ -19,8 +21,8 @@ export class UserEntity {
   @Column({ nullable: false })
   password: string;
 
-  @Column({ nullable: true })
-  gender: string;
+  @Column({ type: 'enum', enum: Gender, nullable: true })
+  gender: Gender;
 
   @Column({ nullable: true })
   username: string;
@@ -49,6 +51,9 @@ export class UserEntity {
     onDelete: 'CASCADE',
   })
   comments: CommentEntity[];
+
+  @OneToMany(() => AttendeeEntity, (attendeeEntity) => attendeeEntity.user)
+  attendees: AttendeeEntity[];
 
   @Column({ nullable: true })
   refresh_token: string;

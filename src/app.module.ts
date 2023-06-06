@@ -18,7 +18,10 @@ import { CommentsModule } from './comments/comments.module';
 import { CommentEntity } from './comments/entity/Comment.entity';
 import { CommentsController } from './comments/comments.controller';
 import { CommentsService } from './comments/comments.service';
-
+import { AttendeesModule } from './attendees/attendees.module';
+import { AttendeeEntity } from './attendees/entity/Attendee.entity';
+import { AttendeesController } from './attendees/attendees.controller';
+import { AttendeesService } from './attendees/attendees.service';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -27,6 +30,7 @@ import { CommentsService } from './comments/comments.service';
     AuthModule,
     PgModule,
     CommentsModule,
+    AttendeesModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -36,7 +40,7 @@ import { CommentsService } from './comments/comments.service';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [UserEntity, EventEntity, CommentEntity],
+        entities: [UserEntity, EventEntity, CommentEntity, AttendeeEntity],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -48,6 +52,7 @@ import { CommentsService } from './comments/comments.service';
     EventsController,
     AuthController,
     CommentsController,
+    AttendeesController,
   ],
   providers: [
     UsersService,
@@ -55,6 +60,7 @@ import { CommentsService } from './comments/comments.service';
     AuthService,
     JwtService,
     CommentsService,
+    AttendeesService,
   ],
 })
 export class AppModule {}

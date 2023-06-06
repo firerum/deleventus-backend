@@ -4,8 +4,10 @@ import {
   IsOptional,
   IsDateString,
   IsDate,
+  IsEnum,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Category, Visibilty } from '../interface/UserEvent.interface';
 
 export class CreateEventDto {
   @ApiProperty({ type: String, description: 'name' })
@@ -13,10 +15,14 @@ export class CreateEventDto {
   @IsNotEmpty()
   readonly name: string;
 
-  @ApiProperty({ type: String, description: 'category', default: 'wedding' })
-  @IsString()
+  @ApiProperty({
+    enum: Category,
+    description: 'category',
+    default: Category.WEDDING,
+  })
+  @IsEnum(Category)
   @IsNotEmpty()
-  readonly category: string;
+  readonly category: Category;
 
   @ApiProperty({ type: String, description: 'venue' })
   @IsString()
@@ -37,8 +43,12 @@ export class CreateEventDto {
   @IsNotEmpty()
   readonly description: string;
 
-  @ApiProperty({ type: String, description: 'visibility', default: 'public' })
-  @IsString()
+  @ApiProperty({
+    enum: Visibilty,
+    description: 'visibility',
+    default: Visibilty.PUBLIC,
+  })
+  @IsEnum(Visibilty)
   @IsOptional()
   readonly visibility: string;
 }

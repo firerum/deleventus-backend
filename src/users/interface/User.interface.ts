@@ -1,9 +1,9 @@
 import { UserEvent } from 'src/events/interface/UserEvent.interface';
 
 export enum Gender {
-  male,
-  female,
-  other,
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHER = 'other',
 }
 
 export interface User {
