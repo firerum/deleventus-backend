@@ -13,6 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { validateCreateUser } from 'src/utils/validateUser';
 import { CreateUserDto } from 'src/users/dto/CreateUser.dto';
 import { ConfigService } from '@nestjs/config';
+import { MailingService } from 'src/mailing/mailing.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly pgService: PgService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly mailingService: MailingService,
   ) {}
 
   // @routes /v1/api/auth/signup
@@ -74,6 +76,7 @@ export class AuthService {
       rows[0].email,
     );
     await this.updateRefreshToken(rows[0].id, refresh_token);
+    await this.mailingService.sendMail(rows[0].email); // verify email by sending valid code link
     return { ...rows[0], password: '', token: access_token, refresh_token };
   }
 
@@ -96,7 +99,6 @@ export class AuthService {
     if (!user) {
       throw new HttpException('User does not exist', HttpStatus.UNAUTHORIZED);
     }
-
     // compare password if user exists
     const validPassword = await argon.verify(user.password, value.password);
     // throw error message on password mismatch

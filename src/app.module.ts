@@ -27,7 +27,6 @@ import { MailingController } from './mailing/mailing.controller';
 import { MailingService } from './mailing/mailing.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -55,13 +54,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     TypeOrmModule.forFeature([UserEntity, EventEntity]),
     MailerModule.forRoot({
       transport: 'smtps://user@domain.com:pass@smtp.domain.com',
-      template: {
-        dir: process.cwd() + '/templates/',
-        adapter: new HandlebarsAdapter(),
-        options: {
-          strict: true,
-        },
-      },
     }),
   ],
   controllers: [

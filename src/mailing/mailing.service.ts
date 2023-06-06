@@ -11,6 +11,7 @@ export class MailingService {
     private readonly config: ConfigService,
   ) {}
 
+  // configuration for the transport mailer
   private async setTransport() {
     const OAuth2 = google.auth.OAuth2;
     const oauth2Client = new OAuth2(
@@ -37,28 +38,25 @@ export class MailingService {
       auth: {
         type: 'OAuth2',
         user: this.config.get('EMAIL'),
-        clientId: this.config.get('CLIENT_ID'),
-        clientSecret: this.config.get('CLIENT_SECRET'),
+        clientId: this.config.get('GOOGLE_ID'),
+        clientSecret: this.config.get('GOOGLE_SECRET'),
         accessToken,
       },
     };
-
     this.mailerService.addTransporter('gmail', config);
   }
 
-  async sendMail() {
+  // the actual mail sent to the user
+  public async sendMail(email = '') {
     await this.setTransport();
     try {
       const result = await this.mailerService.sendMail({
         transporterName: 'gmail',
-        to: 'codesaders@gmail.com', // list of receivers
-        from: 'ademuyiwaadewuyiy@nestjs.com', // sender address
-        subject: 'Verficiaction Code', // Subject line
-        template: 'action',
-        context: {
-          // Data to be sent to template engine..
-          code: '38320',
-        },
+        to: `${email}`, // list of receivers
+        from: 'ademuyiwaadewuyiy@gmail.com', // sender address
+        subject: 'Verification Code', // Subject line
+        text: 'here is the code brother',
+        html: '<p>Verify your account by clicking on this link https://deleventus.com</p>',
       });
       console.log(result);
     } catch (error) {
