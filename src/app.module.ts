@@ -23,7 +23,6 @@ import { AttendeeEntity } from './attendees/entity/Attendee.entity';
 import { AttendeesController } from './attendees/attendees.controller';
 import { AttendeesService } from './attendees/attendees.service';
 import { MailingModule } from './mailing/mailing.module';
-import { MailingController } from './mailing/mailing.controller';
 import { MailingService } from './mailing/mailing.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 
@@ -62,7 +61,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
     AuthController,
     CommentsController,
     AttendeesController,
-    MailingController,
   ],
   providers: [
     UsersService,

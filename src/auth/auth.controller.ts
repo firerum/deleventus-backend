@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/Auth.dto';
+import { ConfirmEmailDto } from './dto/ConfirmEmail.dto';
 import { User } from 'src/users/interface/User.interface';
 import { CreateUserDto } from 'src/users/dto/CreateUser.dto';
 import {
@@ -22,11 +23,15 @@ import {
 import { UserRequestObject } from './custom-decorator/user-object.decorator';
 import { JwtGuard } from './guard/jwt.guard';
 import { JwtRefreshGuard } from './guard/jwtRefresh.guard';
+import { MailingService } from 'src/mailing/mailing.service';
 
 @ApiTags('Auth')
 @Controller({ path: '/api/auth', version: '1' })
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly mailingService: MailingService,
+  ) {}
 
   @ApiCreatedResponse({ description: 'User Registration Successful' })
   @ApiBody({ type: CreateUserDto }) // to ensure swagger understands the request type
@@ -34,6 +39,15 @@ export class AuthController {
   @Post('signup')
   signup(@Body() auth: CreateUserDto): Promise<User> {
     return this.authService.signup(auth);
+  }
+
+  @Post('confirm-email')
+  async Confirm(@Body() confirmationData: ConfirmEmailDto) {
+    const email = await this.mailingService.decodeConfirmationToken(
+      confirmationData.token,
+    );
+    console.log(email);
+    await this.mailingService.confirmEmail(email);
   }
 
   @ApiOkResponse({ description: 'User Login Successful' })

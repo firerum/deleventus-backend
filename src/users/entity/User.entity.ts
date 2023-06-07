@@ -40,7 +40,7 @@ export class UserEntity {
   avatar: string;
 
   @Column({ nullable: true, default: false })
-  verified: boolean;
+  is_verified: boolean;
 
   @OneToMany(() => EventEntity, (eventEntity) => eventEntity.user, {
     onDelete: 'CASCADE',

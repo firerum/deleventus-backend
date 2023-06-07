@@ -1,10 +1,10 @@
 import { Module, Global } from '@nestjs/common';
-import { MailingController } from './mailing.controller';
 import { MailingService } from './mailing.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Global()
 @Module({
-  controllers: [MailingController],
+  imports: [JwtModule.register({})],
   providers: [MailingService],
   exports: [MailingService],
 })
