@@ -76,14 +76,14 @@ export class UsersService {
     updateDto: UpdateUserDto,
     user_id: string,
   ): Promise<User> {
+    if (id !== user_id) {
+      throw new ForbiddenException('Unauthorized access'); // only the right user can update their account
+    }
+    const { error, value } = validateUpdateUser(updateDto);
+    if (error) {
+      return error.message;
+    }
     try {
-      if (id !== user_id) {
-        throw new ForbiddenException('Unauthorized access'); // only the right user can update their account
-      }
-      const { error, value } = validateUpdateUser(updateDto);
-      if (error) {
-        return error.message;
-      }
       const {
         first_name,
         last_name,
@@ -146,10 +146,10 @@ export class UsersService {
   // @method DELETE request
   // @desc delete user with a given id
   async delete(id: string, user_id: string): Promise<void> {
+    if (id !== user_id) {
+      throw new ForbiddenException('Unauthorized Access'); // only the right user can delete their account
+    }
     try {
-      if (id !== user_id) {
-        throw new ForbiddenException('Unauthorized access'); // only the right user can delete their account
-      }
       await this.pgService.pool.query('DELETE FROM user_entity WHERE id = $1', [
         id,
       ]);

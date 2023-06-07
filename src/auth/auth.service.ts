@@ -148,23 +148,30 @@ export class AuthService {
     user_id: string,
     refresh: string,
   ): Promise<{ token: string; refresh_token: string }> {
-    const query = `
-        SELECT * FROM user_entity WHERE id = $1
-    `;
-    const { rows } = await this.pgService.pool.query(query, [user_id]);
-    const [user]: [User] = rows;
-    if (!user || !user.refresh_token) {
-      throw new ForbiddenException('Access Denied');
+    try {
+      const query = `
+            SELECT * FROM user_entity WHERE id = $1
+        `;
+      const { rows } = await this.pgService.pool.query(query, [user_id]);
+      const [user]: [User] = rows;
+      if (!user || !user.refresh_token) {
+        throw new ForbiddenException('Access Denied');
+      }
+      // compare if tokens match
+      const validRefreshToken = await argon.verify(user.refresh_token, refresh);
+      if (!validRefreshToken) {
+        throw new ForbiddenException("Access Denied. Tokens don't match");
+      }
+      const { access_token } = await this.signAccessToken(user.id, user.email);
+      const { refresh_token } = await this.signRefreshToken(
+        user.id,
+        user.email,
+      );
+      await this.updateRefreshToken(user.id, refresh_token);
+      return { token: access_token, refresh_token };
+    } catch (error) {
+      return error;
     }
-    // compare if tokens match
-    const validRefreshToken = await argon.verify(user.refresh_token, refresh);
-    if (!validRefreshToken) {
-      throw new ForbiddenException("Access Denied. Tokens don't match");
-    }
-    const { access_token } = await this.signAccessToken(user.id, user.email);
-    const { refresh_token } = await this.signRefreshToken(user.id, user.email);
-    await this.updateRefreshToken(user.id, refresh_token);
-    return { token: access_token, refresh_token };
   }
 
   // helper functions for creating/modifying tokens
@@ -173,12 +180,16 @@ export class AuthService {
     id: string,
     email: string,
   ): Promise<{ access_token: string }> {
-    const payload = { id, email };
-    const token = await this.jwt.signAsync(payload, {
-      expiresIn: '15m',
-      secret: this.config.get('JWT_SECRET'),
-    });
-    return { access_token: token };
+    try {
+      const payload = { id, email };
+      const token = await this.jwt.signAsync(payload, {
+        expiresIn: '15m',
+        secret: this.config.get('JWT_SECRET'),
+      });
+      return { access_token: token };
+    } catch (error) {
+      return error;
+    }
   }
 
   // create refresh token
@@ -186,12 +197,16 @@ export class AuthService {
     id: string,
     email: string,
   ): Promise<{ refresh_token: string }> {
-    const payload = { id, email };
-    const refreshToken = await this.jwt.signAsync(payload, {
-      expiresIn: '7d',
-      secret: this.config.get('JWT_REFRESH_SECRET'),
-    });
-    return { refresh_token: refreshToken };
+    try {
+      const payload = { id, email };
+      const refreshToken = await this.jwt.signAsync(payload, {
+        expiresIn: '7d',
+        secret: this.config.get('JWT_REFRESH_SECRET'),
+      });
+      return { refresh_token: refreshToken };
+    } catch (error) {
+      return error;
+    }
   }
 
   // update refresh token
@@ -199,13 +214,17 @@ export class AuthService {
     user_id: string,
     refresh_token: string,
   ): Promise<void> {
-    const hashedRefreshToken = await argon.hash(refresh_token);
-    const query = `
-        UPDATE user_entity SET refresh_token = $1 WHERE id = $2 
-    `;
-    await this.pgService.pool.query(query, [
-      (refresh_token = hashedRefreshToken),
-      user_id,
-    ]);
+    try {
+      const hashedRefreshToken = await argon.hash(refresh_token);
+      const query = `
+            UPDATE user_entity SET refresh_token = $1 WHERE id = $2 
+        `;
+      await this.pgService.pool.query(query, [
+        (refresh_token = hashedRefreshToken),
+        user_id,
+      ]);
+    } catch (error) {
+      return error;
+    }
   }
 }

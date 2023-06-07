@@ -42,11 +42,10 @@ export class AuthController {
   }
 
   @Post('confirm-email')
-  async Confirm(@Body() confirmationData: ConfirmEmailDto) {
+  async confirm(@Body() confirmationData: ConfirmEmailDto): Promise<void> {
     const email = await this.mailingService.decodeConfirmationToken(
       confirmationData.token,
     );
-    console.log(email);
     await this.mailingService.confirmEmail(email);
   }
 
@@ -66,7 +65,6 @@ export class AuthController {
     return this.authService.signOut(user.id);
   }
 
-  //   @ApiBearerAuth('refresh_token')
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
   refresh(
