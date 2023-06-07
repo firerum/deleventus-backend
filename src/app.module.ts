@@ -25,6 +25,7 @@ import { AttendeesService } from './attendees/attendees.service';
 import { MailingModule } from './mailing/mailing.module';
 import { MailingService } from './mailing/mailing.service';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { PgService } from './pg/pg.service';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     CommentsService,
     AttendeesService,
     MailingService,
+    PgService,
   ],
 })
 export class AppModule {}

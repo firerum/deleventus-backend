@@ -55,6 +55,9 @@ export class EventsService {
         WHERE id = $1 AND owner_id = $2
       `;
       const { rows } = await this.pgService.pool.query(query, [id, user_id]);
+      if (rows.length < 1) {
+        throw new HttpException('Event Does not Exist', HttpStatus.BAD_REQUEST);
+      }
       const result = rows.map(async (e: UserEvent) => {
         const comments = await this.commentService.findAll(id);
         const attendees = await this.attendeeService.findAll(e.id);
@@ -62,6 +65,19 @@ export class EventsService {
         e.attendees = attendees;
       });
       await Promise.all(result);
+      return rows[0];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // @desc find any single event
+  async findSingle(event_id: string): Promise<UserEvent> {
+    try {
+      const query = `
+        SELECT * FROM event_entity WHERE event_id = $1;
+      `;
+      const { rows } = await this.pgService.pool.query(query, [event_id]);
       return rows[0];
     } catch (error) {
       return error;

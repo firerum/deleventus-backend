@@ -35,4 +35,12 @@ export class AttendeesController {
   ): Promise<Attendee> {
     return this.attendeeService.create(event_id, createAttendeeDto, user.id);
   }
+
+  @Delete()
+  deleteAttendee(
+    @Param('event_id') event_id: string,
+    @UserRequestObject() user: User,
+  ): Promise<void> {
+    return this.attendeeService.delete(user.id, event_id);
+  }
 }
