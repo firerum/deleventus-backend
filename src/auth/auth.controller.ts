@@ -12,14 +12,7 @@ import { AuthDto } from './dto/Auth.dto';
 import { ConfirmEmailDto } from './dto/ConfirmEmail.dto';
 import { User } from 'src/users/interface/User.interface';
 import { CreateUserDto } from 'src/users/dto/CreateUser.dto';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { UserRequestObject } from './custom-decorator/user-object.decorator';
 import { JwtGuard } from './guard/jwt.guard';
 import { JwtRefreshGuard } from './guard/jwtRefresh.guard';
@@ -33,7 +26,6 @@ export class AuthController {
     private readonly mailingService: MailingService,
   ) {}
 
-  @ApiCreatedResponse({ description: 'User Registration Successful' })
   @ApiBody({ type: CreateUserDto }) // to ensure swagger understands the request type
   @HttpCode(HttpStatus.CREATED)
   @Post('signup')
@@ -49,8 +41,11 @@ export class AuthController {
     return await this.mailingService.confirmEmail(email);
   }
 
-  @ApiOkResponse({ description: 'User Login Successful' })
-  @ApiUnauthorizedResponse({ description: 'Invalid Credentials' })
+  @Post('resend-confirmation-email')
+  async resendCofirm(@UserRequestObject() user: User): Promise<void> {
+    await this.mailingService.resendConfirmationLink(user.id);
+  }
+
   @ApiBody({ type: AuthDto }) // to ensure swagger understands the request type
   @HttpCode(HttpStatus.OK)
   @Post('signin')
@@ -65,11 +60,12 @@ export class AuthController {
     return this.authService.signOut(user.id);
   }
 
+  @ApiBearerAuth('access_token')
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
   refresh(
     @UserRequestObject() user: User,
-  ): Promise<{ token: string; refresh_token: string }> {
+  ): Promise<{ access_token: string; refresh_token: string }> {
     return this.authService.refresh(user.id, user.refresh_token);
   }
 }

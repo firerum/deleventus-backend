@@ -92,12 +92,6 @@ export class AuthService {
       if (!user) {
         throw new HttpException('User Does not Exist', HttpStatus.UNAUTHORIZED);
       }
-      if (!user.is_verified) {
-        throw new HttpException(
-          'Pending Account. Please Verify Your Email',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
       // compare password if user exists
       const validPassword = await argon.verify(user.password, value.password);
       // throw error message on password mismatch
@@ -136,7 +130,7 @@ export class AuthService {
   async refresh(
     user_id: string,
     refresh: string,
-  ): Promise<{ token: string; refresh_token: string }> {
+  ): Promise<{ access_token: string; refresh_token: string }> {
     try {
       const query = `
             SELECT * FROM user_entity WHERE id = $1
@@ -157,7 +151,7 @@ export class AuthService {
         user.email,
       );
       await this.updateRefreshToken(user.id, refresh_token);
-      return { token: access_token, refresh_token };
+      return { access_token, refresh_token };
     } catch (error) {
       return error;
     }

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   HttpException,
   HttpStatus,
@@ -71,7 +70,7 @@ export class UsersService {
              WHERE email = $1
            `;
       const { rows } = await this.pgService.pool.query(query, [email]);
-      return { ...rows[0], password: '' };
+      return rows[0];
     } catch (error) {
       return error;
     }
