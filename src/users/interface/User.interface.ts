@@ -20,5 +20,6 @@ export interface User {
   city?: string;
   events: UserEvent[];
   is_verified: boolean;
+  access_token: string;
   refresh_token?: string;
 }

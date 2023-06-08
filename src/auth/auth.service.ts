@@ -14,6 +14,7 @@ import { validateCreateUser } from 'src/utils/validateUser';
 import { CreateUserDto } from 'src/users/dto/CreateUser.dto';
 import { ConfigService } from '@nestjs/config';
 import { MailingService } from 'src/mailing/mailing.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +23,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly mailingService: MailingService,
+    private readonly usersService: UsersService,
   ) {}
 
   // @routes /v1/api/auth/signup
@@ -34,18 +36,10 @@ export class AuthService {
     }
     try {
       // check if user already exists
-      const search = `
-             SELECT * FROM user_entity
-             WHERE email = $1
-           `;
-      const { rows: rowObj } = await this.pgService.pool.query(search, [
-        value.email,
-      ]);
-      const [user]: [User] = rowObj;
-      // throw error message if user exists
+      const user = await this.usersService.findByEmail(value.email);
       if (user) {
         throw new HttpException(
-          'User Exists, Please Sign In!',
+          'User Exists. Please Sign In',
           HttpStatus.CONFLICT,
         );
       }
@@ -77,7 +71,7 @@ export class AuthService {
       );
       await this.updateRefreshToken(rows[0].id, refresh_token);
       await this.mailingService.sendVerificationLink(rows[0].email); // verify email by sending valid token link
-      return { ...rows[0], password: '', token: access_token, refresh_token };
+      return { ...rows[0], password: '', access_token, refresh_token };
     } catch (error) {
       return error;
     }
@@ -93,15 +87,10 @@ export class AuthService {
     }
     try {
       // find user via email
-      const query = `
-            SELECT * FROM user_entity
-            WHERE email = $1
-        `;
-      const { rows } = await this.pgService.pool.query(query, [value.email]);
-      const [user]: [User] = rows;
+      const user = await this.usersService.findByEmail(value.email);
       // throw error message if user does not exist
       if (!user) {
-        throw new HttpException('User does not exist', HttpStatus.UNAUTHORIZED);
+        throw new HttpException('User Does not Exist', HttpStatus.UNAUTHORIZED);
       }
       if (!user.is_verified) {
         throw new HttpException(
@@ -121,7 +110,7 @@ export class AuthService {
         user.email,
       );
       await this.updateRefreshToken(user.id, refresh_token);
-      return { ...rows[0], password: '', token: access_token, refresh_token };
+      return { ...user, password: '', access_token, refresh_token };
     } catch (error) {
       return error;
     }

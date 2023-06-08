@@ -1,4 +1,10 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { User } from 'src/users/interface/User.interface';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { validateUpdateUser } from 'src/utils/validateUser';
@@ -42,6 +48,9 @@ export class UsersService {
          WHERE id = $1
        `;
       const { rows } = await this.pgService.pool.query(query, [id]);
+      if (rows.length < 1) {
+        throw new HttpException('User Does not Exist', HttpStatus.BAD_REQUEST);
+      }
       const result = rows.map(async (user: User) => {
         const events = await this.eventService.findAll(user.id);
         user.events = events;
@@ -62,7 +71,7 @@ export class UsersService {
              WHERE email = $1
            `;
       const { rows } = await this.pgService.pool.query(query, [email]);
-      return rows[0];
+      return { ...rows[0], password: '' };
     } catch (error) {
       return error;
     }
@@ -77,7 +86,7 @@ export class UsersService {
     user_id: string,
   ): Promise<User> {
     if (id !== user_id) {
-      throw new ForbiddenException('Unauthorized access'); // only the right user can update their account
+      throw new ForbiddenException('Unauthorized Access'); // only the right user can update their account
     }
     const { error, value } = validateUpdateUser(updateDto);
     if (error) {
@@ -102,6 +111,9 @@ export class UsersService {
         `SELECT * FROM user_entity WHERE id = $1`,
         [id],
       );
+      if (result.rows.length < 1) {
+        throw new HttpException('User Does not Exist', HttpStatus.BAD_REQUEST);
+      }
       const [user]: [User] = result.rows;
       const query = `
               UPDATE user_entity SET 
@@ -132,11 +144,11 @@ export class UsersService {
   async markEmailAsConfirmed(email: string): Promise<User> {
     try {
       const query = `
-            UPDATE user_entity SET is_verified = TRUE WHERE email = $1
-            RETURNING *
-        `;
+        UPDATE user_entity SET is_verified = TRUE WHERE email = $1
+        RETURNING *
+      `;
       const { rows } = await this.pgService.pool.query(query, [email]);
-      return rows[0];
+      return { ...rows[0], message: 'Verification Successful' };
     } catch (error) {
       return error;
     }

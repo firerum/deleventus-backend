@@ -42,11 +42,11 @@ export class AuthController {
   }
 
   @Post('confirm-email')
-  async confirm(@Body() confirmationData: ConfirmEmailDto): Promise<void> {
+  async confirm(@Body() confirmationData: ConfirmEmailDto): Promise<User> {
     const email = await this.mailingService.decodeConfirmationToken(
       confirmationData.token,
     );
-    await this.mailingService.confirmEmail(email);
+    return await this.mailingService.confirmEmail(email);
   }
 
   @ApiOkResponse({ description: 'User Login Successful' })
