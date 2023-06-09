@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsEmail, IsOptional } from 'class-validator';
+import { Gender } from '../interface/User.interface';
 
 export class UpdateUserDto {
   @IsString()
@@ -21,9 +22,9 @@ export class UpdateUserDto {
   @IsOptional()
   readonly username?: string;
 
-  @IsString()
+  @IsEnum(Gender)
   @IsOptional()
-  readonly gender?: string;
+  readonly gender?: Gender;
 
   @IsString()
   @IsOptional()

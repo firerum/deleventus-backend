@@ -43,7 +43,7 @@ export class CreateUserDto {
   @ApiPropertyOptional({ enum: Gender, description: 'gender' })
   @IsEnum(Gender)
   @IsOptional()
-  readonly gender?: string;
+  readonly gender?: Gender;
 
   @ApiPropertyOptional({ type: String, description: 'phone_no' })
   @IsString()

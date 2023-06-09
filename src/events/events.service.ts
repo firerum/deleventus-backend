@@ -27,37 +27,61 @@ export class EventsService {
   // @method GET request
   // @desc retrieve all events
   async findAll(user_id: string): Promise<UserEvent[]> {
-    const { rows } = await this.pgService.pool.query(
-      'SELECT * FROM event_entity WHERE owner_id = $1',
-      [user_id],
-    );
-    const result = rows.map(async (e: UserEvent) => {
-      const comments = await this.commentService.findAll(e.id);
-      const attendees = await this.attendeeService.findAll(e.id);
-      e.comments = comments;
-      e.attendees = attendees;
-    });
-    await Promise.all(result);
-    return rows; // TODO figure out how rows contain the comments
+    try {
+      const { rows } = await this.pgService.pool.query(
+        'SELECT * FROM event_entity WHERE owner_id = $1',
+        [user_id],
+      );
+      const result = rows.map(async (e: UserEvent) => {
+        const comments = await this.commentService.findAll(e.id);
+        const attendees = await this.attendeeService.findAll(e.id);
+        e.comments = comments;
+        e.attendees = attendees;
+      });
+      await Promise.all(result);
+      return rows; // TODO figure out how rows contain the comments
+    } catch (error) {
+      return error;
+    }
   }
 
   // @routes /v1/api/events/:id
   // @method GET request
   // @desc retrieve event with a given id
   async findOne(id: string, user_id: string): Promise<UserEvent> {
-    const query = `
-         SELECT * FROM event_entity
-         WHERE id = $1 AND owner_id = $2
-       `;
-    const { rows } = await this.pgService.pool.query(query, [id, user_id]);
-    const result = rows.map(async (e: UserEvent) => {
-      const comments = await this.commentService.findAll(id);
-      const attendees = await this.attendeeService.findAll(e.id);
-      e.comments = comments;
-      e.attendees = attendees;
-    });
-    await Promise.all(result);
-    return rows[0];
+    try {
+      const query = `
+        SELECT * FROM event_entity
+        WHERE id = $1 AND owner_id = $2
+      `;
+      const { rows } = await this.pgService.pool.query(query, [id, user_id]);
+      if (rows.length < 1) {
+        throw new HttpException('Event Does not Exist', HttpStatus.BAD_REQUEST);
+      }
+      const result = rows.map(async (e: UserEvent) => {
+        const comments = await this.commentService.findAll(id);
+        const attendees = await this.attendeeService.findAll(e.id);
+        e.comments = comments;
+        e.attendees = attendees;
+      });
+      await Promise.all(result);
+      return rows[0];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // @desc find any single event
+  async findSingle(event_id: string): Promise<UserEvent> {
+    try {
+      const query = `
+        SELECT * FROM event_entity WHERE event_id = $1;
+      `;
+      const { rows } = await this.pgService.pool.query(query, [event_id]);
+      return rows[0];
+    } catch (error) {
+      return error;
+    }
   }
 
   // @routes /v1/api/events
@@ -68,23 +92,27 @@ export class EventsService {
     if (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-    const { name, category, venue, date_of_event, description, visibility } =
-      value;
-    const query = `
-          INSERT INTO event_entity(name, category, venue, date_of_event, description, visibility, owner_id)
-          VALUES ($1, $2, $3, $4, $5, $6, $7) 
-          RETURNING *
+    try {
+      const { name, category, venue, date_of_event, description, visibility } =
+        value;
+      const query = `
+        INSERT INTO event_entity(name, category, venue, date_of_event, description, visibility, owner_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7) 
+        RETURNING *
       `;
-    const { rows } = await this.pgService.pool.query(query, [
-      name,
-      category,
-      venue,
-      date_of_event,
-      description,
-      visibility,
-      user_id,
-    ]);
-    return rows[0];
+      const { rows } = await this.pgService.pool.query(query, [
+        name,
+        category,
+        venue,
+        date_of_event,
+        description,
+        visibility,
+        user_id,
+      ]);
+      return rows[0];
+    } catch (error) {
+      return error;
+    }
   }
 
   // @routes /v1/api/events/:id
@@ -99,59 +127,71 @@ export class EventsService {
     if (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-    const {
-      name,
-      category,
-      venue,
-      date_of_event,
-      description,
-      visibility,
-      updated_at,
-    } = value;
-    //check if event already exists and pre-populate the properties that weren't updated
-    const result = await this.pgService.pool.query(
-      `SELECT * FROM event_entity WHERE id = $1`,
-      [id],
-    );
-    const [event]: [UserEvent] = result.rows;
-    if (user_id !== event.owner_id) {
-      throw new ForbiddenException('Unauthorized User');
-    }
-    const query = `
-          UPDATE event_entity SET 
-          name = $1, category = $2, venue = $3, date_of_event = $4, description = $5,
-          visibility = $6, updated_at = $7
-          WHERE id = $8
-          RETURNING *
+    try {
+      const {
+        name,
+        category,
+        venue,
+        date_of_event,
+        description,
+        visibility,
+        updated_at,
+      } = value;
+      //check if event already exists and pre-populate the properties that weren't updated
+      const result = await this.pgService.pool.query(
+        `SELECT * FROM event_entity WHERE id = $1`,
+        [id],
+      );
+      const [event]: [UserEvent] = result.rows;
+      if (!event) {
+        throw new HttpException('Event Does not Exist', HttpStatus.BAD_REQUEST);
+      }
+      if (user_id !== event.owner_id) {
+        throw new ForbiddenException('Unauthorized Access');
+      }
+      const query = `
+        UPDATE event_entity SET 
+        name = $1, category = $2, venue = $3, date_of_event = $4, description = $5,
+        visibility = $6, updated_at = $7
+        WHERE id = $8
+        RETURNING *
       `;
-    const { rows } = await this.pgService.pool.query(query, [
-      name ?? event?.name,
-      category ?? event?.category,
-      venue ?? event?.venue,
-      date_of_event ?? event?.date_of_event,
-      description ?? event?.description,
-      visibility ?? event?.visibility,
-      updated_at,
-      id,
-    ]);
-    return rows[0];
+      const { rows } = await this.pgService.pool.query(query, [
+        name ?? event?.name,
+        category ?? event?.category,
+        venue ?? event?.venue,
+        date_of_event ?? event?.date_of_event,
+        description ?? event?.description,
+        visibility ?? event?.visibility,
+        updated_at,
+        id,
+      ]);
+      return rows[0];
+    } catch (error) {
+      return error;
+    }
   }
 
   // @routes /v1/api/events/:id
   // @method DELETE request
   // @desc delete event with a given id
   async delete(id: string, user_id: string): Promise<void> {
-    const query = `
-         SELECT * FROM event_entity
-         WHERE id = $1
-       `;
-    const { rows } = await this.pgService.pool.query(query, [id]);
-    const [event]: [UserEvent] = rows;
-    if (event?.owner_id !== user_id) {
-      throw new ForbiddenException('Unauthorized access');
+    try {
+      const query = `
+        SELECT * FROM event_entity
+        WHERE id = $1
+      `;
+      const { rows } = await this.pgService.pool.query(query, [id]);
+      const [event]: [UserEvent] = rows;
+      if (event?.owner_id !== user_id) {
+        throw new ForbiddenException('Unauthorized Access');
+      }
+      await this.pgService.pool.query(
+        'DELETE FROM event_entity WHERE id = $1',
+        [id],
+      );
+    } catch (error) {
+      return error;
     }
-    await this.pgService.pool.query('DELETE FROM event_entity WHERE id = $1', [
-      id,
-    ]);
   }
 }

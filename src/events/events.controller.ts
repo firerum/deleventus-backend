@@ -17,28 +17,22 @@ import { UpdateEventDto } from './dto/UpdateEvent.dto';
 import { User } from 'src/users/interface/User.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiNoContentResponse,
-  ApiOkResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { EmailConfirmationGuard } from 'src/auth/guard/EmailConfirmation.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Events')
 @ApiBearerAuth('access_token')
+@UseGuards(EmailConfirmationGuard) // this is above the '@UseGuards(JwtGuard)' because decorators are read from bottom to top
 @UseGuards(JwtGuard) // add the guard to the controller itself instead of individual endpoints
 @Controller({ path: '/api/events', version: '1' })
 export class EventsController {
   constructor(private readonly eventService: EventsService) {}
 
-  @ApiOkResponse({ description: 'Get All Events Succesful' })
   @Get()
   findAllEvents(@UserRequestObject() user: User): Promise<UserEvent[]> {
     return this.eventService.findAll(user.id);
   }
 
-  @ApiOkResponse({ description: 'Find Event By ID Successful' })
   @Get(':id')
   findOneEvent(
     @Param('id') id: string,
@@ -47,7 +41,6 @@ export class EventsController {
     return this.eventService.findOne(id, user.id);
   }
 
-  @ApiCreatedResponse({ description: 'Event Create Successful' })
   @HttpCode(HttpStatus.CREATED)
   @Post()
   createEvent(
@@ -57,7 +50,6 @@ export class EventsController {
     return this.eventService.create(createDto, user.id);
   }
 
-  @ApiOkResponse({ description: 'Event Update Successful' })
   @Put(':id')
   updateEvent(
     @Param('id') id: string,
@@ -67,7 +59,6 @@ export class EventsController {
     return this.eventService.update(id, updateDto, user.id);
   }
 
-  @ApiNoContentResponse({ description: 'Event Delete Successful' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   deleteEvent(

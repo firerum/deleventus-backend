@@ -22,6 +22,11 @@ import { AttendeesModule } from './attendees/attendees.module';
 import { AttendeeEntity } from './attendees/entity/Attendee.entity';
 import { AttendeesController } from './attendees/attendees.controller';
 import { AttendeesService } from './attendees/attendees.service';
+import { MailingModule } from './mailing/mailing.module';
+import { MailingService } from './mailing/mailing.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PgService } from './pg/pg.service';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -31,6 +36,7 @@ import { AttendeesService } from './attendees/attendees.service';
     PgModule,
     CommentsModule,
     AttendeesModule,
+    MailingModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -46,6 +52,9 @@ import { AttendeesService } from './attendees/attendees.service';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([UserEntity, EventEntity]),
+    MailerModule.forRoot({
+      transport: 'smtps://user@domain.com:pass@smtp.domain.com',
+    }),
   ],
   controllers: [
     UsersController,
@@ -61,6 +70,8 @@ import { AttendeesService } from './attendees/attendees.service';
     JwtService,
     CommentsService,
     AttendeesService,
+    MailingService,
+    PgService,
   ],
 })
 export class AppModule {}

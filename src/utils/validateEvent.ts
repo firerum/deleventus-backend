@@ -31,18 +31,12 @@ export const validateUpdateEvent = (
 ): Joi.ValidationResult<UpdateEventDto> => {
   const schema = Joi.object({
     name: Joi.string().lowercase(),
-    category: Joi.string()
-      .valid('wedding', 'birthday', 'others')
-      .default('wedding')
-      .lowercase(),
+    category: Joi.string().valid('wedding', 'birthday', 'others').lowercase(),
     venue: Joi.string().lowercase(),
     date_of_event: Joi.date().timestamp().iso(),
     description: Joi.string().lowercase(),
     updated_at: Joi.date().timestamp().default(new Date()),
-    visibility: Joi.string()
-      .valid('private', 'public')
-      .lowercase()
-      .default('public'),
+    visibility: Joi.string().valid('private', 'public').lowercase(),
   });
   return schema.validate(body);
 };
