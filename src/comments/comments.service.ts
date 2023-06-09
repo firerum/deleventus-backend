@@ -3,10 +3,14 @@ import {
   Injectable,
   HttpException,
   HttpStatus,
+  Inject,
+  forwardRef,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateCommentDto, UpdateCommentDto } from './dto/Comment.dto';
 import { Comment } from './interface/comment.interface';
 import { PgService } from 'src/pg/pg.service';
+import { EventsService } from 'src/events/events.service';
 import {
   validateCreateComment,
   validateUpdateComment,
@@ -14,10 +18,16 @@ import {
 
 @Injectable()
 export class CommentsService {
-  constructor(private readonly pgService: PgService) {}
+  constructor(
+    @Inject(forwardRef(() => EventsService))
+    private readonly eventsService: EventsService,
+    private readonly pgService: PgService,
+  ) {}
 
   async findAll(event_id: string): Promise<Comment[]> {
     try {
+      const event = await this.eventsService.findSingle(event_id);
+      if (!event) throw new BadRequestException('Event Does not Exist');
       const query = `
         SELECT * FROM comment_entity WHERE event_id = $1
       `;

@@ -14,9 +14,11 @@ import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
 import { Comment } from './interface/comment.interface';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { EmailConfirmationGuard } from 'src/auth/guard/EmailConfirmation.guard';
 
 @ApiTags('Comments')
 @ApiBearerAuth('access_token')
+@UseGuards(EmailConfirmationGuard)
 @UseGuards(JwtGuard)
 @Controller({ path: '/api/events/:event_id/comments', version: '1' })
 export class CommentsController {
