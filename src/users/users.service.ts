@@ -147,7 +147,7 @@ export class UsersService {
         RETURNING *
       `;
       const { rows } = await this.pgService.pool.query(query, [email]);
-      return { ...rows[0], message: 'Verification Successful' };
+      return rows[0];
     } catch (error) {
       return error;
     }

@@ -34,14 +34,18 @@ export class AuthController {
   }
 
   @Post('confirm-email')
-  async confirm(@Body() confirmationData: ConfirmEmailDto): Promise<User> {
+  async confirm(
+    @Body() confirmationData: ConfirmEmailDto,
+  ): Promise<{ message: string }> {
     const email = await this.mailingService.decodeConfirmationToken(
       confirmationData.token,
     );
     return await this.mailingService.confirmEmail(email);
   }
 
-  @Post('resend-confirmation-email')
+  @ApiBearerAuth('access_token')
+  @UseGuards(JwtGuard)
+  @Post('resend-confirmation-link')
   async resendCofirm(@UserRequestObject() user: User): Promise<void> {
     await this.mailingService.resendConfirmationLink(user.id);
   }

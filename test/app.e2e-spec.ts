@@ -61,7 +61,7 @@ describe('AppController (e2e)', () => {
         password: '123456',
       });
 
-      token = response.body.token;
+      token = response.body.access_token;
       userId = response.body.id;
 
       expect(response.status).toBe(200);

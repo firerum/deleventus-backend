@@ -60,7 +60,6 @@ export class AuthService {
         value.avatar,
         value.country,
       ]);
-      // TODO remove access and refresh token for newly signed up users
       const { access_token } = await this.signAccessToken(
         rows[0].id,
         rows[0].email,

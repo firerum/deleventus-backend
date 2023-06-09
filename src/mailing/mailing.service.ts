@@ -10,7 +10,6 @@ import { google } from 'googleapis';
 import { Options } from 'nodemailer/lib/smtp-transport';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/interface/User.interface';
 
 @Injectable()
 export class MailingService {
@@ -73,7 +72,10 @@ export class MailingService {
       const result = await this.mailerService.sendMail({
         transporterName: 'gmail',
         to: `${email}`, // list of receivers
-        from: 'ademuyiwaadewuyiy@gmail.com', // sender address
+        from: {
+          name: 'Deleventus',
+          address: 'ademuyiwaadewuyi@gmail.com',
+        }, // sender address
         subject: 'Verification Code', // Subject line
         text: `Welcome to Deleventus. To confirm your email, click here: ${url}`,
         html: `<p>Welcome to Deleventus. To confirm your email, click <a href="${url}">here</a></p>`,
@@ -85,14 +87,16 @@ export class MailingService {
   }
 
   // confirm email by updating (is_verified = true)
-  public async confirmEmail(email: string): Promise<User> {
+  public async confirmEmail(email: string): Promise<{ message: string }> {
     try {
       const user = await this.usersService.findByEmail(email);
       if (user.is_verified) {
         throw new BadRequestException('Email already confirmed');
       }
-      const u = await this.usersService.markEmailAsConfirmed(email);
-      console.log(u);
+      const verifiedEmail = await this.usersService.markEmailAsConfirmed(email);
+      if (verifiedEmail) {
+        return { message: 'Email Verification Successful' };
+      }
     } catch (error) {
       return error;
     }
