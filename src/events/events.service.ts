@@ -75,7 +75,7 @@ export class EventsService {
   async findSingle(event_id: string): Promise<UserEvent> {
     try {
       const query = `
-        SELECT * FROM event_entity WHERE event_id = $1;
+        SELECT * FROM event_entity WHERE id = $1;
       `;
       const { rows } = await this.pgService.pool.query(query, [event_id]);
       return rows[0];
@@ -138,11 +138,7 @@ export class EventsService {
         updated_at,
       } = value;
       //check if event already exists and pre-populate the properties that weren't updated
-      const result = await this.pgService.pool.query(
-        `SELECT * FROM event_entity WHERE id = $1`,
-        [id],
-      );
-      const [event]: [UserEvent] = result.rows;
+      const event: UserEvent = await this.findSingle(id);
       if (!event) {
         throw new HttpException('Event Does not Exist', HttpStatus.BAD_REQUEST);
       }
@@ -177,12 +173,7 @@ export class EventsService {
   // @desc delete event with a given id
   async delete(id: string, user_id: string): Promise<void> {
     try {
-      const query = `
-        SELECT * FROM event_entity
-        WHERE id = $1
-      `;
-      const { rows } = await this.pgService.pool.query(query, [id]);
-      const [event]: [UserEvent] = rows;
+      const event: UserEvent = await this.findSingle(id);
       if (event?.owner_id !== user_id) {
         throw new ForbiddenException('Unauthorized Access');
       }
