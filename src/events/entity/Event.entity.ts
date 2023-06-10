@@ -37,7 +37,9 @@ export class EventEntity {
   @Column({ nullable: true })
   avatar: string;
 
-  @ManyToOne(() => UserEntity, (userEntity) => userEntity.events)
+  @ManyToOne(() => UserEntity, (userEntity) => userEntity.events, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({
     name: 'owner_id',
     referencedColumnName: 'id',

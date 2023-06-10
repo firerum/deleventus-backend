@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { UserEvent } from 'src/events/interface/UserEvent.interface';
@@ -19,6 +20,7 @@ import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
 import { EmailConfirmationGuard } from 'src/auth/guard/EmailConfirmation.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { validateIdParam } from 'src/utils/validateParam';
 
 @ApiTags('Events')
 @ApiBearerAuth('access_token')
@@ -38,6 +40,8 @@ export class EventsController {
     @Param('id') id: string,
     @UserRequestObject() user: User,
   ): Promise<UserEvent> {
+    const { error } = validateIdParam({ id });
+    if (error) throw new BadRequestException();
     return this.eventService.findOne(id, user.id);
   }
 
@@ -56,6 +60,8 @@ export class EventsController {
     @Body() updateDto: UpdateEventDto,
     @UserRequestObject() user: User,
   ): Promise<UserEvent> {
+    const { error } = validateIdParam({ id });
+    if (error) throw new BadRequestException();
     return this.eventService.update(id, updateDto, user.id);
   }
 
@@ -65,6 +71,8 @@ export class EventsController {
     @Param('id') id: string,
     @UserRequestObject() user: User,
   ): Promise<void> {
+    const { error } = validateIdParam({ id });
+    if (error) throw new BadRequestException();
     return this.eventService.delete(id, user.id);
   }
 }

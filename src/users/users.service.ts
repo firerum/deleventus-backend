@@ -70,6 +70,9 @@ export class UsersService {
              WHERE email = $1
            `;
       const { rows } = await this.pgService.pool.query(query, [email]);
+      if (rows.length < 1) {
+        throw new HttpException('User Does not Exist', HttpStatus.BAD_REQUEST);
+      }
       return rows[0];
     } catch (error) {
       return error;
