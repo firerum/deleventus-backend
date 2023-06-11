@@ -6,10 +6,11 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/Auth.dto';
-import { ConfirmEmailDto } from './dto/ConfirmEmail.dto';
+import { EmailDto } from './dto/Email.dto';
 import { User } from 'src/users/interface/User.interface';
 import { CreateUserDto } from 'src/users/dto/CreateUser.dto';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
@@ -17,6 +18,7 @@ import { UserRequestObject } from './custom-decorator/user-object.decorator';
 import { JwtGuard } from './guard/jwt.guard';
 import { JwtRefreshGuard } from './guard/jwtRefresh.guard';
 import { MailingService } from 'src/mailing/mailing.service';
+import { PasswordResetDto } from './dto/PasswordReset.dto';
 
 @ApiTags('Auth')
 @Controller({ path: '/api/auth', version: '1' })
@@ -33,20 +35,19 @@ export class AuthController {
     return this.authService.signup(auth);
   }
 
-  @Post('confirm-email')
-  async confirm(
-    @Body() confirmationData: ConfirmEmailDto,
-  ): Promise<{ message: string }> {
+  @Get('confirm-email')
+  async confirm(@Query('token') token: string): Promise<{ message: string }> {
     const email = await this.mailingService.decodeConfirmationToken(
-      confirmationData.token,
+      token,
+      'OTC_SECRET',
     );
     return await this.mailingService.confirmEmail(email);
   }
 
   @ApiBearerAuth('access_token')
   @UseGuards(JwtGuard)
-  @Post('resend-confirmation-link')
-  async resendCofirm(@UserRequestObject() user: User): Promise<void> {
+  @Get('resend-confirmation-link')
+  async resendConfirm(@UserRequestObject() user: User): Promise<void> {
     await this.mailingService.resendConfirmationLink(user.id);
   }
 
@@ -55,6 +56,25 @@ export class AuthController {
   @Post('signin')
   signin(@Body() auth: AuthDto): Promise<User> {
     return this.authService.signin(auth);
+  }
+
+  @ApiBody({ type: EmailDto })
+  @Post('reset-password-link')
+  async reset(@Body() emailDto: EmailDto) {
+    return await this.mailingService.sendPasswordLink(emailDto.email);
+  }
+
+  @ApiBody({ type: PasswordResetDto })
+  @Post('reset-password')
+  async resetPassword(
+    @Query('token') token: string,
+    @Body() passwordDto: PasswordResetDto,
+  ) {
+    const email = await this.mailingService.decodeConfirmationToken(
+      token,
+      'PASSWORD_SECRET',
+    );
+    return await this.mailingService.resetPassword(email, passwordDto);
   }
 
   @ApiBearerAuth('access_token')
