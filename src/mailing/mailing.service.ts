@@ -93,10 +93,9 @@ export class MailingService {
         secret: this.configService.get('OTC_SECRET'),
         expiresIn: '24h',
       });
-      const url = `http://localhost:5000/v1/api/auth/confirm-email?token=${token}`;
       const body = {
         email,
-        url,
+        url: `http://localhost:5000/v1/api/auth/confirm-email?token=${token}`,
         subject: 'Verifcation Code',
         text: 'To confirm your email',
       };
@@ -165,10 +164,9 @@ export class MailingService {
         secret: this.configService.get('PASSWORD_SECRET'),
         expiresIn: '3m',
       });
-      const url = `http://localhost:5000/v1/api/auth/reset-password?token=${token}`;
       const body = {
         email,
-        url,
+        url: `http://localhost:5000/v1/api/auth/reset-password?token=${token}`,
         subject: 'Password Reset',
         text: 'To reset your password',
       };
