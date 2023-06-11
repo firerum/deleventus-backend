@@ -9,6 +9,8 @@ import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { validateUpdateUser } from 'src/utils/validateUser';
 import { PgService } from 'src/pg/pg.service';
 import { EventsService } from 'src/events/events.service';
+import { PasswordResetDto } from 'src/auth/dto/PasswordReset.dto';
+import * as argon from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -70,6 +72,9 @@ export class UsersService {
              WHERE email = $1
            `;
       const { rows } = await this.pgService.pool.query(query, [email]);
+      if (rows.length < 1) {
+        throw new HttpException('User Does not Exist', HttpStatus.BAD_REQUEST);
+      }
       return rows[0];
     } catch (error) {
       return error;
@@ -147,6 +152,24 @@ export class UsersService {
         RETURNING *
       `;
       const { rows } = await this.pgService.pool.query(query, [email]);
+      return rows[0];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // @desc reset user password
+  async resetUserPassword(
+    email: string,
+    passwordDto: PasswordResetDto,
+  ): Promise<User> {
+    try {
+      const hash = await argon.hash(passwordDto.password);
+      const query = `
+        UPDATE user_entity SET password = $1 WHERE email = $2
+        RETURNING *
+      `;
+      const { rows } = await this.pgService.pool.query(query, [hash, email]);
       return rows[0];
     } catch (error) {
       return error;

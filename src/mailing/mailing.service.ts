@@ -10,6 +10,7 @@ import { google } from 'googleapis';
 import { Options } from 'nodemailer/lib/smtp-transport';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
+import { PasswordResetDto } from 'src/auth/dto/PasswordReset.dto';
 
 @Injectable()
 export class MailingService {
@@ -55,19 +56,9 @@ export class MailingService {
     this.mailerService.addTransporter('gmail', config);
   }
 
-  // send confirmation link to new user upon sign up
-  public async sendVerificationLink(email: string): Promise<void> {
+  // the actual email sent to the user
+  private async sendEmail(email: string, url: string) {
     try {
-      // create a jwt token for the email confirmation link
-      const payload = { email };
-      const token = this.jwtService.sign(payload, {
-        secret: this.configService.get('OTC_SECRET'),
-        expiresIn: '24h',
-      });
-
-      const url = `http://localhost:5000/v1/api/auth/confirm-email?token=${token}`;
-
-      // the actual email sent to the user
       await this.setTransport();
       const result = await this.mailerService.sendMail({
         transporterName: 'gmail',
@@ -83,6 +74,22 @@ export class MailingService {
       console.log(result);
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  // send confirmation link to new user upon sign up
+  public async sendVerificationLink(email: string): Promise<void> {
+    try {
+      // create a jwt token for the email link
+      const payload = { email };
+      const token = this.jwtService.sign(payload, {
+        secret: this.configService.get('OTC_SECRET'),
+        expiresIn: '24h',
+      });
+      const url = `http://localhost:5000/v1/api/auth/confirm-email?token=${token}`;
+      await this.sendEmail(email, url);
+    } catch (error) {
+      return error;
     }
   }
 
@@ -103,10 +110,13 @@ export class MailingService {
   }
 
   // decode the email token link sent from frontend
-  public async decodeConfirmationToken(token: string): Promise<string> {
+  public async decodeConfirmationToken(
+    token: string,
+    secret: string,
+  ): Promise<string> {
     try {
       const payload = await this.jwtService.verify(token, {
-        secret: this.configService.get('OTC_SECRET'),
+        secret: this.configService.get(secret),
       });
       if (typeof payload === 'object' && 'email' in payload) {
         return payload.email;
@@ -114,10 +124,7 @@ export class MailingService {
       throw new BadRequestException();
     } catch (error) {
       if (error?.name === 'TokenExpiredError') {
-        throw new HttpException(
-          'Email confirmation token expired',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException('Expired Link', HttpStatus.BAD_REQUEST);
       }
       throw new HttpException('Bad confirmation token', HttpStatus.BAD_REQUEST);
     }
@@ -130,5 +137,43 @@ export class MailingService {
       throw new BadRequestException('Email already confirmed');
     }
     await this.sendVerificationLink(user.email);
+  }
+
+  // send password reset link
+  public async sendPasswordLink(email: string) {
+    try {
+      const user = await this.usersService.findByEmail(email);
+      if (!user || user['response'] === 'User Does not Exist') {
+        throw new HttpException(
+          'Account Does not Exist',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      // create a jwt token for the password link
+      const payload = { email };
+      const token = this.jwtService.sign(payload, {
+        secret: this.configService.get('PASSWORD_SECRET'),
+        expiresIn: '5m',
+      });
+      const url = `http://localhost:5000/v1/api/auth/reset-password?token=${token}`;
+      await this.sendEmail(email, url);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  public async resetPassword(email: string, password: PasswordResetDto) {
+    try {
+      const user = await this.usersService.findByEmail(email);
+      if (!user || user['response'] === 'User Does not Exist') {
+        throw new BadRequestException('Account Does not Exist');
+      }
+      const update = await this.usersService.resetUserPassword(email, password);
+      if (update) {
+        return { message: 'Password Reset Successful' };
+      }
+    } catch (error) {
+      return error;
+    }
   }
 }

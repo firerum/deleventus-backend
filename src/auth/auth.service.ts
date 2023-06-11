@@ -37,7 +37,7 @@ export class AuthService {
     try {
       // check if user already exists
       const user = await this.usersService.findByEmail(value.email);
-      if (user) {
+      if (user && user['response'] !== 'User Does not Exist') {
         throw new HttpException(
           'User Exists. Please Sign In',
           HttpStatus.CONFLICT,
@@ -88,7 +88,7 @@ export class AuthService {
       // find user via email
       const user = await this.usersService.findByEmail(value.email);
       // throw error message if user does not exist
-      if (!user) {
+      if (!user || user['response'] === 'User Does not Exist') {
         throw new HttpException('User Does not Exist', HttpStatus.UNAUTHORIZED);
       }
       // compare password if user exists
