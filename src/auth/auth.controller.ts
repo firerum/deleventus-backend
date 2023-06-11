@@ -37,10 +37,7 @@ export class AuthController {
 
   @Get('confirm-email')
   async confirm(@Query('token') token: string): Promise<{ message: string }> {
-    const email = await this.mailingService.decodeConfirmationToken(
-      token,
-      'OTC_SECRET',
-    );
+    const email = await this.mailingService.decodeToken(token, 'OTC_SECRET');
     return await this.mailingService.confirmEmail(email);
   }
 
@@ -70,7 +67,7 @@ export class AuthController {
     @Query('token') token: string,
     @Body() passwordDto: PasswordResetDto,
   ) {
-    const email = await this.mailingService.decodeConfirmationToken(
+    const email = await this.mailingService.decodeToken(
       token,
       'PASSWORD_SECRET',
     );

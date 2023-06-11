@@ -7,10 +7,17 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 import { google } from 'googleapis';
-import { Options } from 'nodemailer/lib/smtp-transport';
+import { Options, SentMessageInfo } from 'nodemailer/lib/smtp-transport';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { PasswordResetDto } from 'src/auth/dto/PasswordReset.dto';
+
+type EmailObject = {
+  email: string;
+  url: string;
+  subject: string;
+  text: string;
+};
 
 @Injectable()
 export class MailingService {
@@ -57,21 +64,21 @@ export class MailingService {
   }
 
   // the actual email sent to the user
-  private async sendEmail(email: string, url: string) {
+  private async sendEmail(body: EmailObject): Promise<SentMessageInfo> {
     try {
       await this.setTransport();
-      const result = await this.mailerService.sendMail({
+      const result: SentMessageInfo = await this.mailerService.sendMail({
         transporterName: 'gmail',
-        to: `${email}`, // list of receivers
+        to: `${body.email}`, // list of receivers
         from: {
           name: 'Deleventus',
           address: 'ademuyiwaadewuyi@gmail.com',
         }, // sender address
-        subject: 'Verification Code', // Subject line
-        text: `Welcome to Deleventus. To confirm your email, click here: ${url}`,
-        html: `<p>Welcome to Deleventus. To confirm your email, click <a href="${url}">here</a></p>`,
+        subject: `${body.subject}`, // Subject line
+        text: `Welcome to Deleventus. ${body.text}, click here: ${body.url}`,
+        html: `<p>Welcome to Deleventus. ${body.text}, click <a href="${body.url}">here</a></p>`,
       });
-      console.log(result);
+      return result;
     } catch (error) {
       console.log(error);
     }
@@ -87,7 +94,13 @@ export class MailingService {
         expiresIn: '24h',
       });
       const url = `http://localhost:5000/v1/api/auth/confirm-email?token=${token}`;
-      await this.sendEmail(email, url);
+      const body = {
+        email,
+        url,
+        subject: 'Verifcation Code',
+        text: 'To confirm your email',
+      };
+      await this.sendEmail(body);
     } catch (error) {
       return error;
     }
@@ -110,10 +123,7 @@ export class MailingService {
   }
 
   // decode the email token link sent from frontend
-  public async decodeConfirmationToken(
-    token: string,
-    secret: string,
-  ): Promise<string> {
+  public async decodeToken(token: string, secret: string): Promise<string> {
     try {
       const payload = await this.jwtService.verify(token, {
         secret: this.configService.get(secret),
@@ -153,10 +163,19 @@ export class MailingService {
       const payload = { email };
       const token = this.jwtService.sign(payload, {
         secret: this.configService.get('PASSWORD_SECRET'),
-        expiresIn: '5m',
+        expiresIn: '3m',
       });
       const url = `http://localhost:5000/v1/api/auth/reset-password?token=${token}`;
-      await this.sendEmail(email, url);
+      const body = {
+        email,
+        url,
+        subject: 'Password Reset',
+        text: 'To reset your password',
+      };
+      const result = await this.sendEmail(body);
+      if (typeof result === 'object' && 'accepted' in result) {
+        return { message: 'Check your inbox for your password reset link' };
+      }
     } catch (error) {
       return error;
     }
