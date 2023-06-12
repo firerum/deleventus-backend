@@ -9,10 +9,10 @@ import {
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto, UpdateCommentDto } from './dto/Comment.dto';
-import type { User } from 'src/users/interface/User.interface';
+import { User } from 'src/users/interface/User.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
-import type { Comment } from './interface/comment.interface';
+import { Comment } from './interface/comment.interface';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { EmailConfirmationGuard } from 'src/auth/guard/EmailConfirmation.guard';
 
