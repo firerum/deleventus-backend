@@ -20,6 +20,9 @@
 
 # Usage
 
+# SWAGGER Documentation
+- Go to http://localhost:5000/api for the full documentation on how to consume the API
+
 ## Auth Routes
 
 ## sign up a user
