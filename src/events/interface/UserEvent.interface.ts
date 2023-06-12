@@ -1,4 +1,4 @@
-import { Comment } from 'src/comments/interface/comment.interface';
+import { Comment } from 'src/comments/interface/Comment.interface';
 import { Attendee } from 'src/attendees/interface/Attendee.interface';
 
 export enum Visibilty {

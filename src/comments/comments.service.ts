@@ -8,7 +8,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { CreateCommentDto, UpdateCommentDto } from './dto/Comment.dto';
-import { Comment } from './interface/comment.interface';
+import { Comment } from './interface/Comment.interface';
 import { PgService } from 'src/pg/pg.service';
 import { EventsService } from 'src/events/events.service';
 import {
