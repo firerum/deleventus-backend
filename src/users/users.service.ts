@@ -145,6 +145,7 @@ export class UsersService {
   }
 
   // @desc Update isVerified = true;
+  //TODO include updated_at
   async markEmailAsConfirmed(email: string): Promise<User> {
     try {
       const query = `
@@ -159,6 +160,7 @@ export class UsersService {
   }
 
   // @desc reset user password
+  //TODO include updated_at
   async resetUserPassword(
     email: string,
     passwordDto: PasswordResetDto,
