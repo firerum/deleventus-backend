@@ -26,6 +26,7 @@ import { MailingModule } from './mailing/mailing.module';
 import { MailingService } from './mailing/mailing.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PgService } from './pg/pg.service';
+import { TicketingModule } from './ticketing/ticketing.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { PgService } from './pg/pg.service';
     CommentsModule,
     AttendeesModule,
     MailingModule,
+    TicketingModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
