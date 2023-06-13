@@ -75,7 +75,7 @@ export class MailingService {
         }, // sender address
         subject: `${body.subject}`, // Subject line
         text: `Welcome to Deleventus. ${body.text}, click here: ${body.url}`,
-        html: `<p>Welcome to Deleventus. ${body.text}, click <a href="${body.url}">here</a></p>`,
+        html: `<p>Welcome to Deleventus. ${body.text}, click here: ${body.url}</p>`,
       });
       return result;
     } catch (error) {
@@ -95,7 +95,7 @@ export class MailingService {
       const body = {
         email,
         url: `${process.env.ENV_URL}/v1/api/auth/confirm-email?token=${token}`,
-        subject: 'Verifcation Code',
+        subject: 'Verification Code',
         text: 'To confirm your email',
       };
       await this.sendEmail(body);
