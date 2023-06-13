@@ -18,7 +18,6 @@ type EmailObject = {
   subject: string;
   text: string;
 };
-
 @Injectable()
 export class MailingService {
   constructor(
@@ -95,7 +94,7 @@ export class MailingService {
       });
       const body = {
         email,
-        url: `http://localhost:5000/v1/api/auth/confirm-email?token=${token}`,
+        url: `${process.env.ENV_URL}/v1/api/auth/confirm-email?token=${token}`,
         subject: 'Verifcation Code',
         text: 'To confirm your email',
       };
@@ -166,7 +165,7 @@ export class MailingService {
       });
       const body = {
         email,
-        url: `http://localhost:5000/v1/api/auth/reset-password?token=${token}`,
+        url: `${process.env.ENV_URL}/v1/api/auth/reset-password?token=${token}`,
         subject: 'Password Reset',
         text: 'To reset your password',
       };
