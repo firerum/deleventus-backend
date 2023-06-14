@@ -100,7 +100,7 @@ export class MailingService {
       };
       await this.sendEmail(body);
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -116,7 +116,7 @@ export class MailingService {
         return { message: 'Email Verification Successful' };
       }
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -140,11 +140,15 @@ export class MailingService {
 
   // resend confirmation link for user whose token expired or who didn't see link
   public async resendConfirmationLink(user_id: string) {
-    const user = await this.usersService.findOne(user_id);
-    if (user.is_verified) {
-      throw new BadRequestException('Email already confirmed');
+    try {
+      const user = await this.usersService.findOne(user_id);
+      if (user.is_verified) {
+        throw new BadRequestException('Email already confirmed');
+      }
+      await this.sendVerificationLink(user.email);
+    } catch (error) {
+      throw error;
     }
-    await this.sendVerificationLink(user.email);
   }
 
   // send password reset link
@@ -174,7 +178,7 @@ export class MailingService {
         return { message: 'Check your inbox for your password reset link' };
       }
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -189,7 +193,7 @@ export class MailingService {
         return { message: 'Password Reset Successful' };
       }
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 }

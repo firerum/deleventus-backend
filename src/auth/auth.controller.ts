@@ -38,14 +38,14 @@ export class AuthController {
   @Get('confirm-email')
   async confirm(@Query('token') token: string): Promise<{ message: string }> {
     const email = await this.mailingService.decodeToken(token, 'OTC_SECRET');
-    return await this.mailingService.confirmEmail(email);
+    return this.mailingService.confirmEmail(email);
   }
 
   @ApiBearerAuth('access_token')
   @UseGuards(JwtGuard)
   @Get('resend-confirmation-link')
-  async resendConfirm(@UserRequestObject() user: User): Promise<void> {
-    await this.mailingService.resendConfirmationLink(user.id);
+  resendConfirm(@UserRequestObject() user: User): Promise<void> {
+    return this.mailingService.resendConfirmationLink(user.id);
   }
 
   @ApiBody({ type: AuthDto }) // to ensure swagger understands the request type
@@ -57,8 +57,8 @@ export class AuthController {
 
   @ApiBody({ type: EmailDto })
   @Post('reset-password-link')
-  async reset(@Body() emailDto: EmailDto) {
-    return await this.mailingService.sendPasswordLink(emailDto.email);
+  reset(@Body() emailDto: EmailDto) {
+    return this.mailingService.sendPasswordLink(emailDto.email);
   }
 
   @ApiBody({ type: PasswordResetDto })
@@ -71,7 +71,7 @@ export class AuthController {
       token,
       'PASSWORD_SECRET',
     );
-    return await this.mailingService.resetPassword(email, passwordDto);
+    return this.mailingService.resetPassword(email, passwordDto);
   }
 
   @ApiBearerAuth('access_token')

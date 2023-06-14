@@ -6,6 +6,7 @@ import {
   Body,
   Param,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto, UpdateCommentDto } from './dto/Comment.dto';
@@ -15,6 +16,7 @@ import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorat
 import { Comment } from './interface/Comment.interface';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { EmailConfirmationGuard } from 'src/auth/guard/EmailConfirmation.guard';
+import { validateIdParam } from 'src/utils/validateParam';
 
 @ApiTags('Comments')
 @ApiBearerAuth('access_token')
@@ -28,6 +30,8 @@ export class CommentsController {
   async findAllComments(
     @Param('event_id') event_id: string,
   ): Promise<Comment[]> {
+    const { error } = validateIdParam({ id: event_id });
+    if (error) throw new BadRequestException();
     return this.commentService.findAll(event_id);
   }
 
@@ -37,6 +41,8 @@ export class CommentsController {
     @UserRequestObject() user: User,
     @Param('event_id') event_id: string,
   ): Promise<Comment> {
+    const { error } = validateIdParam({ id: event_id });
+    if (error) throw new BadRequestException();
     return this.commentService.create(createCommentDto, user.id, event_id);
   }
 
@@ -46,6 +52,8 @@ export class CommentsController {
     @Param('id') id: string,
     @UserRequestObject() user: User,
   ): Promise<Comment> {
+    const { error } = validateIdParam({ id });
+    if (error) throw new BadRequestException();
     return this.commentService.update(updateCommentDto, user.id, id);
   }
 }

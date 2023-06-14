@@ -34,7 +34,7 @@ export class CommentsService {
       const { rows } = await this.pgService.pool.query(query, [event_id]);
       return rows;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -51,7 +51,7 @@ export class CommentsService {
       error,
     } = validateCreateComment(createDto);
     if (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new BadRequestException(error.message);
     }
     try {
       const query = `
@@ -66,7 +66,7 @@ export class CommentsService {
       ]);
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -90,6 +90,9 @@ export class CommentsService {
         'SELECT * FROM comment_entity WHERE id = $1',
         [id],
       );
+      if (commentObject.length < 1) {
+        throw new BadRequestException('Comment Does not Exist.');
+      }
       if (userId !== commentObject[0].user_id) {
         throw new ForbiddenException('Unauthorized Access');
       }
@@ -104,7 +107,7 @@ export class CommentsService {
       ]);
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 }

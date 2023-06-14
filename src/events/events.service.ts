@@ -41,7 +41,7 @@ export class EventsService {
       await Promise.all(result);
       return rows; // TODO figure out how rows contain the comments
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -67,7 +67,7 @@ export class EventsService {
       await Promise.all(result);
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -80,7 +80,7 @@ export class EventsService {
       const { rows } = await this.pgService.pool.query(query, [event_id]);
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -111,7 +111,7 @@ export class EventsService {
       ]);
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -164,7 +164,7 @@ export class EventsService {
       ]);
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -182,7 +182,7 @@ export class EventsService {
         [id],
       );
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 }

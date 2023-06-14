@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   HttpException,
   HttpStatus,
@@ -35,7 +36,7 @@ export class UsersService {
       await Promise.all(result);
       return rows;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -60,7 +61,7 @@ export class UsersService {
       await Promise.all(result);
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -77,7 +78,7 @@ export class UsersService {
       }
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -94,7 +95,7 @@ export class UsersService {
     }
     const { error, value } = validateUpdateUser(updateDto);
     if (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
     try {
       const {
@@ -155,7 +156,7 @@ export class UsersService {
       const { rows } = await this.pgService.pool.query(query, [email]);
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -174,7 +175,7 @@ export class UsersService {
       const { rows } = await this.pgService.pool.query(query, [hash, email]);
       return rows[0];
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -190,7 +191,7 @@ export class UsersService {
         id,
       ]);
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 }

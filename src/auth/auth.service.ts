@@ -3,6 +3,7 @@ import {
   Injectable,
   HttpException,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthDto } from './dto/Auth.dto';
 import * as argon from 'argon2';
@@ -32,7 +33,7 @@ export class AuthService {
   async signup(auth: CreateUserDto): Promise<User> {
     const { error, value } = validateCreateUser(auth);
     if (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
     try {
       // check if user already exists
@@ -69,10 +70,10 @@ export class AuthService {
         rows[0].email,
       );
       await this.updateRefreshToken(rows[0].id, refresh_token);
-      await this.mailingService.sendVerificationLink(rows[0].email); // verify email by sending valid token link
+      this.mailingService.sendVerificationLink(rows[0].email); // verify email by sending valid token link
       return { ...rows[0], password: '', access_token, refresh_token };
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -82,7 +83,7 @@ export class AuthService {
   async signin(auth: AuthDto): Promise<User> {
     const { error, value } = validateSignIn(auth);
     if (error) {
-      return error.message;
+      throw new BadRequestException(error.message);
     }
     try {
       // find user via email
@@ -105,7 +106,7 @@ export class AuthService {
       await this.updateRefreshToken(user.id, refresh_token);
       return { ...user, password: '', access_token, refresh_token };
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -119,7 +120,7 @@ export class AuthService {
         `;
       await this.pgService.pool.query(query, [user_id]);
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -152,7 +153,7 @@ export class AuthService {
       await this.updateRefreshToken(user.id, refresh_token);
       return { access_token, refresh_token };
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -170,7 +171,7 @@ export class AuthService {
       });
       return { access_token: token };
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -187,7 +188,7 @@ export class AuthService {
       });
       return { refresh_token: refreshToken };
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
@@ -206,7 +207,7 @@ export class AuthService {
         user_id,
       ]);
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 }
