@@ -3,6 +3,8 @@ import {
   HttpException,
   HttpStatus,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -24,6 +26,7 @@ export class MailingService {
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
 
@@ -196,4 +199,19 @@ export class MailingService {
       throw error;
     }
   }
+
+  // send ticket link with QRcode to attendee
+  //   public async sendTicketLink(email: string) {
+  //     try {
+  //       const body = {
+  //         email,
+  //         url: ``,
+  //         subject: 'Event Ticket',
+  //         text: 'Check your ticket to the event below',
+  //       };
+  //       await this.sendEmail(body);
+  //     } catch (error) {
+  //       throw error;
+  //     }
+  //   }
 }

@@ -9,7 +9,7 @@ export const validateCreateEvent = (
   const schema = Joi.object({
     name: Joi.string().lowercase().required(),
     category: Joi.string()
-      .valid('wedding', 'birthday', 'christening', 'others')
+      .valid('wedding', 'birthday', 'convocation', 'other')
       .lowercase()
       .default('wedding')
       .required(),
@@ -31,7 +31,9 @@ export const validateUpdateEvent = (
 ): Joi.ValidationResult<UpdateEventDto> => {
   const schema = Joi.object({
     name: Joi.string().lowercase(),
-    category: Joi.string().valid('wedding', 'birthday', 'others').lowercase(),
+    category: Joi.string()
+      .valid('wedding', 'birthday', 'convocation', 'other')
+      .lowercase(),
     venue: Joi.string().lowercase(),
     date_of_event: Joi.date().timestamp().iso(),
     description: Joi.string().lowercase(),

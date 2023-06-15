@@ -10,6 +10,7 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
+import { TicketEntity } from 'src/ticketing/entity/Ticket.entity';
 
 @Entity()
 export class EventEntity {
@@ -54,6 +55,9 @@ export class EventEntity {
 
   @OneToMany(() => AttendeeEntity, (attendeeEntity) => attendeeEntity.event)
   attendees: AttendeeEntity[];
+
+  @OneToMany(() => TicketEntity, (ticketEntity) => ticketEntity.event)
+  tickets: TicketEntity[];
 
   @Column({
     type: 'timestamptz',

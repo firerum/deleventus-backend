@@ -141,7 +141,7 @@ export class UsersService {
       ]);
       return { ...rows[0], password: '' };
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 

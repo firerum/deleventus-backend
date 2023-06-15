@@ -27,6 +27,9 @@ import { MailingService } from './mailing/mailing.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PgService } from './pg/pg.service';
 import { TicketingModule } from './ticketing/ticketing.module';
+import { TicketingService } from './ticketing/ticketing.service';
+import { TicketingController } from './ticketing/ticketing.controller';
+import { TicketEntity } from './ticketing/entity/Ticket.entity';
 
 @Module({
   imports: [
@@ -48,7 +51,13 @@ import { TicketingModule } from './ticketing/ticketing.module';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [UserEntity, EventEntity, CommentEntity, AttendeeEntity],
+        entities: [
+          UserEntity,
+          EventEntity,
+          CommentEntity,
+          AttendeeEntity,
+          TicketEntity,
+        ],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -64,6 +73,7 @@ import { TicketingModule } from './ticketing/ticketing.module';
     AuthController,
     CommentsController,
     AttendeesController,
+    TicketingController,
   ],
   providers: [
     UsersService,
@@ -74,6 +84,7 @@ import { TicketingModule } from './ticketing/ticketing.module';
     AttendeesService,
     MailingService,
     PgService,
+    TicketingService,
   ],
 })
 export class AppModule {}

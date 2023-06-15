@@ -3,6 +3,8 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { UserEvent } from 'src/events/interface/UserEvent.interface';
 import { CreateEventDto } from './dto/CreateEvent.dto';
@@ -14,6 +16,7 @@ import {
 import { PgService } from 'src/pg/pg.service';
 import { CommentsService } from 'src/comments/comments.service';
 import { AttendeesService } from 'src/attendees/attendees.service';
+import { TicketingService } from 'src/ticketing/ticketing.service';
 
 @Injectable()
 export class EventsService {
@@ -21,11 +24,14 @@ export class EventsService {
     private readonly pgService: PgService,
     private readonly commentService: CommentsService,
     private readonly attendeeService: AttendeesService,
+    @Inject(forwardRef(() => TicketingService))
+    private readonly ticketingService: TicketingService,
   ) {}
 
   // @routes /v1/api/events
   // @method GET request
   // @desc retrieve all events
+  //TODO find if this is feasible in terms of performance
   async findAll(user_id: string): Promise<UserEvent[]> {
     try {
       const { rows } = await this.pgService.pool.query(
@@ -35,8 +41,10 @@ export class EventsService {
       const result = rows.map(async (e: UserEvent) => {
         const comments = await this.commentService.findAll(e.id);
         const attendees = await this.attendeeService.findAll(e.id);
+        const tickets = await this.ticketingService.findAll(e.id);
         e.comments = comments;
         e.attendees = attendees;
+        e.tickets = tickets;
       });
       await Promise.all(result);
       return rows; // TODO figure out how rows contain the comments
@@ -61,8 +69,10 @@ export class EventsService {
       const result = rows.map(async (e: UserEvent) => {
         const comments = await this.commentService.findAll(id);
         const attendees = await this.attendeeService.findAll(e.id);
+        const tickets = await this.ticketingService.findAll(e.id);
         e.comments = comments;
         e.attendees = attendees;
+        e.tickets = tickets;
       });
       await Promise.all(result);
       return rows[0];
