@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsDateString,
-  IsDate,
-  IsEnum,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category, Visibilty } from '../interface/UserEvent.interface';
 
@@ -49,6 +42,6 @@ export class CreateEventDto {
     default: Visibilty.PUBLIC,
   })
   @IsEnum(Visibilty)
-  @IsOptional()
-  readonly visibility: string;
+  @IsNotEmpty()
+  readonly visibility: Visibilty;
 }
