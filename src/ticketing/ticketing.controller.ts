@@ -15,8 +15,8 @@ import { validateIdParam } from 'src/utils/validateParam';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 
 @ApiTags('Tickets')
-@ApiBearerAuth('access_token')
-@UseGuards(JwtGuard)
+// @ApiBearerAuth('access_token')
+// @UseGuards(JwtGuard)
 @Controller({ path: 'api/events/:event_id/tickets', version: '1' })
 export class TicketingController {
   constructor(private readonly ticketingService: TicketingService) {}

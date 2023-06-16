@@ -13,10 +13,12 @@ import { Options, SentMessageInfo } from 'nodemailer/lib/smtp-transport';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { PasswordResetDto } from 'src/auth/dto/PasswordReset.dto';
+import { toDataURL } from 'qrcode';
+import { TicketDto } from 'src/ticketing/dto/Ticket.dto';
 
 type EmailObject = {
   email: string;
-  url: string;
+  html: string;
   subject: string;
   text: string;
 };
@@ -66,19 +68,21 @@ export class MailingService {
   }
 
   // the actual email sent to the user
+  //TODO refactor code
   private async sendEmail(body: EmailObject): Promise<SentMessageInfo> {
     try {
       await this.setTransport();
       const result: SentMessageInfo = await this.mailerService.sendMail({
         transporterName: 'gmail',
-        to: `${body.email}`, // list of receivers
+        to: body.email,
         from: {
           name: 'Deleventus',
           address: 'ademuyiwaadewuyi@gmail.com',
-        }, // sender address
-        subject: `${body.subject}`, // Subject line
-        text: `Welcome to Deleventus. ${body.text}, click here: ${body.url}`,
-        html: `<p>Welcome to Deleventus. ${body.text}, click here: ${body.url}</p>`,
+        },
+        subject: body.subject,
+        text: body.text,
+        html: body.html,
+        attachDataUrls: true,
       });
       return result;
     } catch (error) {
@@ -86,20 +90,27 @@ export class MailingService {
     }
   }
 
+  // create a jwt token
+  private createToken(email: string, secret: string, time: string): string {
+    const payload = { email };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get(secret),
+      expiresIn: time,
+    });
+    return token;
+  }
+
   // send confirmation link to new user upon sign up
+  //TODO refactor code
   public async sendVerificationLink(email: string): Promise<void> {
     try {
-      // create a jwt token for the email link
-      const payload = { email };
-      const token = this.jwtService.sign(payload, {
-        secret: this.configService.get('OTC_SECRET'),
-        expiresIn: '24h',
-      });
+      const token = this.createToken(email, 'OTC_SECRET', '24hr');
+      const url = `Welcome to Deleventus. To confirm your email, click here: ${process.env.ENV_URL}/v1/api/auth/confirm-email?token=${token}`;
       const body = {
         email,
-        url: `${process.env.ENV_URL}/v1/api/auth/confirm-email?token=${token}`,
+        html: `<p>${url}</p>`,
         subject: 'Verification Code',
-        text: 'To confirm your email',
+        text: `${url}`,
       };
       await this.sendEmail(body);
     } catch (error) {
@@ -155,7 +166,8 @@ export class MailingService {
   }
 
   // send password reset link
-  public async sendPasswordLink(email: string) {
+  //TODO refactor code
+  public async sendPasswordLink(email: string): Promise<{ message: string }> {
     try {
       const user = await this.usersService.findByEmail(email);
       if (!user || user['response'] === 'User Does not Exist') {
@@ -164,17 +176,13 @@ export class MailingService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      // create a jwt token for the password link
-      const payload = { email };
-      const token = this.jwtService.sign(payload, {
-        secret: this.configService.get('PASSWORD_SECRET'),
-        expiresIn: '3m',
-      });
+      const token = this.createToken(email, 'PASSWORD_SECRET', '3m');
+      const url = `Welcome to Deleventus. To reset your password, click here: ${process.env.ENV_URL}/v1/api/auth/reset-password?token=${token}`;
       const body = {
         email,
-        url: `${process.env.ENV_URL}/v1/api/auth/reset-password?token=${token}`,
+        html: `${url}`,
         subject: 'Password Reset',
-        text: 'To reset your password',
+        text: `${url}`,
       };
       const result = await this.sendEmail(body);
       if (typeof result === 'object' && 'accepted' in result) {
@@ -185,7 +193,10 @@ export class MailingService {
     }
   }
 
-  public async resetPassword(email: string, password: PasswordResetDto) {
+  public async resetPassword(
+    email: string,
+    password: PasswordResetDto,
+  ): Promise<{ message: string }> {
     try {
       const user = await this.usersService.findByEmail(email);
       if (!user || user['response'] === 'User Does not Exist') {
@@ -200,18 +211,27 @@ export class MailingService {
     }
   }
 
-  // send ticket link with QRcode to attendee
-  //   public async sendTicketLink(email: string) {
-  //     try {
-  //       const body = {
-  //         email,
-  //         url: ``,
-  //         subject: 'Event Ticket',
-  //         text: 'Check your ticket to the event below',
-  //       };
-  //       await this.sendEmail(body);
-  //     } catch (error) {
-  //       throw error;
-  //     }
-  //   }
+  // send ticket link with QRcode to attendee email
+  //TODO refactor code
+  public async sendTicket(value: TicketDto): Promise<{ message: string }> {
+    try {
+      const image = await toDataURL(JSON.stringify(value), {
+        errorCorrectionLevel: 'H',
+        type: 'image/png',
+      });
+      const url = `Welcome to Deleventus. Check your ticket to the event below <br/> <img src="${image}">`;
+      const body = {
+        email: value.attendee_email,
+        html: `<p>${url}</p>`,
+        subject: 'Event Ticket',
+        text: `${url}`,
+      };
+      const result = await this.sendEmail(body);
+      if (typeof result === 'object' && 'accepted' in result) {
+        return { message: 'Check your inbox for ticket' };
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 }

@@ -3,8 +3,6 @@ import {
   Inject,
   forwardRef,
   BadRequestException,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { PgService } from 'src/pg/pg.service';
 import { Ticket } from './interface/Ticket.interface';
@@ -60,7 +58,8 @@ export class TicketingService {
   // @routes /v1/api/events/:event_id/tickets
   // @method POST request
   // @desc create ticket for event
-  async createTicket(event_id: string, ticketDto: TicketDto): Promise<Ticket> {
+  //TODO refactor code
+  async createTicket(event_id: string, ticketDto: TicketDto): Promise<any> {
     const { error, value } = validateTicket(ticketDto);
     if (error) {
       throw new BadRequestException(error.message);
@@ -72,7 +71,8 @@ export class TicketingService {
       }
       const attendee = await this.findSingle(event_id, value.attendee_email);
       if (attendee) {
-        throw new HttpException('Ticket already issued', HttpStatus.CONFLICT);
+        this.mailingService.sendTicket(value);
+        return { message: 'Check your inbox for new ticket' };
       }
       const query = `
         INSERT INTO ticket_entity(attendee_email, attendee_first_name, attendee_last_name, attendee_phone_no, event_id)
@@ -86,13 +86,8 @@ export class TicketingService {
         value.attendee_phone_no,
         event_id,
       ]);
-      //   this.mailingService.sendTicketLink(value.email);
-      return {
-        ...rows,
-        event_name: event.name,
-        event_venue: event.venue,
-        event_date: event.date_of_event,
-      };
+      this.mailingService.sendTicket(value);
+      return rows[0];
     } catch (error) {
       throw error;
     }
