@@ -30,6 +30,7 @@ import { TicketingModule } from './ticketing/ticketing.module';
 import { TicketingService } from './ticketing/ticketing.service';
 import { TicketingController } from './ticketing/ticketing.controller';
 import { TicketEntity } from './ticketing/entity/Ticket.entity';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -65,6 +66,10 @@ import { TicketEntity } from './ticketing/entity/Ticket.entity';
     TypeOrmModule.forFeature([UserEntity, EventEntity]),
     MailerModule.forRoot({
       transport: 'smtps://user@domain.com:pass@smtp.domain.com',
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 60, // time in seconds
+      limit: 30, // number of api calls
     }),
   ],
   controllers: [
