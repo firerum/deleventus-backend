@@ -94,7 +94,7 @@ export class CommentsService {
         throw new BadRequestException('Comment Does not Exist.');
       }
       if (userId !== commentObject[0].user_id) {
-        throw new ForbiddenException('Unauthorized Access');
+        throw new ForbiddenException('Access Denied');
       }
       const query = `
             UPDATE comment_entity SET comment = $1, updated_at =$2 WHERE id = $3

@@ -33,7 +33,7 @@ export class UsersService {
         user.events = events;
         user.password = '';
       });
-      await Promise.all(result);
+      await Promise.allSettled(result);
       return rows;
     } catch (error) {
       throw error;
@@ -51,14 +51,14 @@ export class UsersService {
        `;
       const { rows } = await this.pgService.pool.query(query, [id]);
       if (rows.length < 1) {
-        throw new HttpException('User Does not Exist', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('User Does not Exist');
       }
       const result = rows.map(async (user: User) => {
         const events = await this.eventService.findAll(user.id);
         user.events = events;
         user.password = '';
       });
-      await Promise.all(result);
+      await Promise.allSettled(result);
       return rows[0];
     } catch (error) {
       throw error;
@@ -74,7 +74,7 @@ export class UsersService {
            `;
       const { rows } = await this.pgService.pool.query(query, [email]);
       if (rows.length < 1) {
-        throw new HttpException('User Does not Exist', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('User Does not Exist');
       }
       return rows[0];
     } catch (error) {
@@ -91,7 +91,7 @@ export class UsersService {
     user_id: string,
   ): Promise<User> {
     if (id !== user_id) {
-      throw new ForbiddenException('Unauthorized Access'); // only the right user can update their account
+      throw new ForbiddenException('Access Denied'); // only the right user can update their account
     }
     const { error, value } = validateUpdateUser(updateDto);
     if (error) {
@@ -117,7 +117,7 @@ export class UsersService {
         [id],
       );
       if (result.rows.length < 1) {
-        throw new HttpException('User Does not Exist', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('User Does not Exist');
       }
       const [user]: [User] = result.rows;
       const query = `
@@ -184,7 +184,7 @@ export class UsersService {
   // @desc delete user with a given id
   async delete(id: string, user_id: string): Promise<void> {
     if (id !== user_id) {
-      throw new ForbiddenException('Unauthorized Access'); // only the right user can delete their account
+      throw new ForbiddenException('Access Denied'); // only the right user can delete their account
     }
     try {
       await this.pgService.pool.query('DELETE FROM user_entity WHERE id = $1', [

@@ -10,9 +10,10 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
-import { UserEvent } from 'src/events/interface/UserEvent.interface';
+import { Category, UserEvent } from 'src/events/interface/UserEvent.interface';
 import { CreateEventDto } from './dto/CreateEvent.dto';
 import { UpdateEventDto } from './dto/UpdateEvent.dto';
 import { User } from 'src/users/interface/User.interface';
@@ -33,6 +34,14 @@ export class EventsController {
   @Get()
   findAllEvents(@UserRequestObject() user: User): Promise<UserEvent[]> {
     return this.eventService.findAll(user.id);
+  }
+
+  @Get('filter')
+  findEventsByCategory(
+    @Query('category') category: Category,
+    @UserRequestObject() user: User,
+  ): Promise<UserEvent[]> {
+    return this.eventService.findByCategory(user.id, category);
   }
 
   @Get(':id')

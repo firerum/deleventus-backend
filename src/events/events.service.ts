@@ -5,8 +5,9 @@ import {
   Injectable,
   Inject,
   forwardRef,
+  BadRequestException,
 } from '@nestjs/common';
-import { UserEvent } from 'src/events/interface/UserEvent.interface';
+import { UserEvent, Category } from 'src/events/interface/UserEvent.interface';
 import { CreateEventDto } from './dto/CreateEvent.dto';
 import { UpdateEventDto } from './dto/UpdateEvent.dto';
 import {
@@ -34,20 +35,54 @@ export class EventsService {
   //TODO find if this is feasible in terms of performance
   async findAll(user_id: string): Promise<UserEvent[]> {
     try {
-      const { rows } = await this.pgService.pool.query(
-        'SELECT * FROM event_entity WHERE owner_id = $1',
-        [user_id],
-      );
-      const result = rows.map(async (e: UserEvent) => {
-        const comments = await this.commentService.findAll(e.id);
-        const attendees = await this.attendeeService.findAll(e.id);
-        const tickets = await this.ticketingService.findAll(e.id);
-        e.comments = comments;
-        e.attendees = attendees;
-        e.tickets = tickets;
-      });
-      await Promise.all(result);
+      const query = `
+        SELECT * FROM event_entity WHERE owner_id = $1
+        `;
+      const { rows } = await this.pgService.pool.query(query, [user_id]);
+      const result = this.populateFields(rows);
+      await Promise.allSettled(result);
       return rows; // TODO figure out how rows contain the comments
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // @desc method to populate comments, tickets, attendees of event
+  populateFields(rows: any[]): Promise<void>[] {
+    const result = rows.map(async (e: UserEvent) => {
+      const comments = await this.commentService.findAll(e.id);
+      const attendees = await this.attendeeService.findAll(e.id);
+      const tickets = await this.ticketingService.findAll(e.id);
+      e.comments = comments;
+      e.attendees = attendees;
+      e.tickets = tickets;
+    });
+    return result;
+  }
+
+  // @routes /v1/api/events/filter?category=
+  // @method GET request
+  // @desc retrieve all events by category
+  async findByCategory(
+    user_id: string,
+    category: Category,
+  ): Promise<UserEvent[]> {
+    try {
+      if (!Object.values(Category).includes(category)) {
+        throw new BadRequestException(
+          `Category must be one of ${Object.values(Category)}`,
+        );
+      }
+      const query = `
+        SELECT * FROM event_entity WHERE owner_id = $1 AND category = $2
+    `;
+      const { rows } = await this.pgService.pool.query(query, [
+        user_id,
+        category,
+      ]);
+      const result = this.populateFields(rows);
+      await Promise.allSettled(result);
+      return rows;
     } catch (error) {
       throw error;
     }
@@ -66,15 +101,8 @@ export class EventsService {
       if (rows.length < 1) {
         throw new HttpException('Event Does not Exist', HttpStatus.BAD_REQUEST);
       }
-      const result = rows.map(async (e: UserEvent) => {
-        const comments = await this.commentService.findAll(id);
-        const attendees = await this.attendeeService.findAll(e.id);
-        const tickets = await this.ticketingService.findAll(e.id);
-        e.comments = comments;
-        e.attendees = attendees;
-        e.tickets = tickets;
-      });
-      await Promise.all(result);
+      const result = this.populateFields(rows);
+      await Promise.allSettled(result);
       return rows[0];
     } catch (error) {
       throw error;
@@ -153,7 +181,7 @@ export class EventsService {
         throw new HttpException('Event Does not Exist', HttpStatus.BAD_REQUEST);
       }
       if (user_id !== event.owner_id) {
-        throw new ForbiddenException('Unauthorized Access');
+        throw new ForbiddenException('Access Denied');
       }
       const query = `
         UPDATE event_entity SET 
@@ -185,7 +213,7 @@ export class EventsService {
     try {
       const event: UserEvent = await this.findSingle(id);
       if (event?.owner_id !== user_id) {
-        throw new ForbiddenException('Unauthorized Access');
+        throw new ForbiddenException('Access Denied');
       }
       await this.pgService.pool.query(
         'DELETE FROM event_entity WHERE id = $1',

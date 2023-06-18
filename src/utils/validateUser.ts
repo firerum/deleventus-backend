@@ -40,7 +40,7 @@ export const validateUpdateUser = (body: UpdateUserDto): any => {
     password: Joi.string().min(6),
     username: Joi.string().lowercase().trim().min(3),
     gender: Joi.string().valid('male', 'female', 'other').trim(),
-    phone_no: Joi.number(),
+    phone_no: Joi.string().trim(),
     avatar: Joi.string().trim(),
     city: Joi.string().trim(),
     country: Joi.string(),
