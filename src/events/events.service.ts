@@ -81,7 +81,7 @@ export class EventsService {
         category,
       ]);
       const result = this.populateFields(rows);
-      await Promise.allSettled(result); // TODO figure out how rows contain the comments
+      await Promise.allSettled(result);
       return rows;
     } catch (error) {
       throw error;
