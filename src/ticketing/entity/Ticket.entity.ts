@@ -12,7 +12,7 @@ export class TicketEntity {
   @PrimaryGeneratedColumn('increment')
   id: string;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: false })
   attendee_email: string;
 
   @Column({ nullable: false })
