@@ -40,15 +40,12 @@ export class TicketingService {
   }
 
   // @desc find a single attendee ticket
-  async findSingle(event_id: string, attendee_email: string): Promise<Ticket> {
+  async findSingle(attendee_email: string): Promise<Ticket> {
     try {
       const query = `
-        SELECT * FROM ticket_entity WHERE event_id = $1 AND attendee_email = $2
+        SELECT * FROM ticket_entity WHERE attendee_email = $1
     `;
-      const { rows } = await this.pgService.pool.query(query, [
-        event_id,
-        attendee_email,
-      ]);
+      const { rows } = await this.pgService.pool.query(query, [attendee_email]);
       return rows[0];
     } catch (error) {
       throw error;
@@ -69,7 +66,7 @@ export class TicketingService {
       if (!event) {
         throw new BadRequestException('Event Does not Exist');
       }
-      const attendee = await this.findSingle(event_id, value.attendee_email);
+      const attendee = await this.findSingle(value.attendee_email);
       if (attendee) {
         this.mailingService.sendTicket(value);
         return { message: 'Check your inbox for new ticket' };
