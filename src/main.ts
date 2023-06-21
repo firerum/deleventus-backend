@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,9 @@ async function bootstrap() {
 
   // accept cross origin
   app.enableCors();
+
+  // helmet for proper headers
+  app.use(helmet());
 
   // this is to use class validators on my DTOs and remove unwanted properties that may be passed
   app.useGlobalPipes(

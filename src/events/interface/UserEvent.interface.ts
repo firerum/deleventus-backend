@@ -11,6 +11,7 @@ export enum Category {
   WEDDING = 'wedding',
   BIRTHDAY = 'birthday',
   CONVOCATION = 'convocation',
+  ANNIVERSARY = 'anniversary',
   OTHER = 'other',
 }
 

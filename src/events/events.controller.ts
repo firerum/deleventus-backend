@@ -20,7 +20,7 @@ import { User } from 'src/users/interface/User.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
 import { EmailConfirmationGuard } from 'src/auth/guard/EmailConfirmation.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { validateIdParam } from 'src/utils/validateParam';
 
 @ApiTags('Events')
@@ -36,6 +36,7 @@ export class EventsController {
     return this.eventService.findAll(user.id);
   }
 
+  @ApiQuery({ name: 'category', enum: Category })
   @Get('filter')
   findEventsByCategory(
     @Query('category') category: Category,

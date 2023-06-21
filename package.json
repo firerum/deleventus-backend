@@ -38,6 +38,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "googleapis": "^118.0.0",
+    "helmet": "^7.0.0",
     "joi": "^17.9.2",
     "nodemailer": "^6.9.3",
     "pactum": "^3.4.0",
