@@ -9,6 +9,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { TicketEntity } from 'src/ticketing/entity/Ticket.entity';
 
@@ -38,6 +39,13 @@ export class EventEntity {
   @Column({ nullable: true })
   avatar: string;
 
+  @Column({ nullable: true })
+  city: string;
+
+  @Column({ nullable: true })
+  country: string;
+
+  @Index('owner_id')
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.events, {
     onDelete: 'CASCADE',
   })

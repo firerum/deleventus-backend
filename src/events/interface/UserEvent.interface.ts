@@ -20,6 +20,8 @@ export interface UserEvent {
   name: string;
   category: Category;
   venue: string;
+  city: string;
+  country: string;
   date_of_event: string;
   description: string;
   visibility: Visibilty;

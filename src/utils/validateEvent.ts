@@ -14,6 +14,8 @@ export const validateCreateEvent = (
       .default('wedding')
       .required(),
     venue: Joi.string().lowercase().required(),
+    city: Joi.string().lowercase().required(),
+    country: Joi.string().lowercase().required(),
     date_of_event: Joi.date().timestamp().iso().required(),
     description: Joi.string().lowercase(),
     created_at: Joi.date().timestamp().default(new Date()),
@@ -35,6 +37,8 @@ export const validateUpdateEvent = (
       .valid('wedding', 'birthday', 'convocation', 'anniversary', 'other')
       .lowercase(),
     venue: Joi.string().lowercase(),
+    city: Joi.string().lowercase(),
+    country: Joi.string().lowercase(),
     date_of_event: Joi.date().timestamp().iso(),
     description: Joi.string().lowercase(),
     updated_at: Joi.date().timestamp().default(new Date()),

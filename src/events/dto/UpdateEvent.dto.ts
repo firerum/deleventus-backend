@@ -22,6 +22,14 @@ export class UpdateEventDto {
   @IsOptional()
   readonly venue?: string;
 
+  @ApiPropertyOptional({ type: String, description: 'city' })
+  @IsString()
+  readonly city: string;
+
+  @ApiPropertyOptional({ type: String, description: 'country' })
+  @IsString()
+  readonly country: string;
+
   @ApiPropertyOptional({
     type: String,
     description: 'date_of_event',

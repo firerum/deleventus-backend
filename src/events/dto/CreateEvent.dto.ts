@@ -22,6 +22,16 @@ export class CreateEventDto {
   @IsNotEmpty()
   readonly venue: string;
 
+  @ApiProperty({ type: String, description: 'city' })
+  @IsString()
+  @IsNotEmpty()
+  readonly city: string;
+
+  @ApiProperty({ type: String, description: 'country' })
+  @IsString()
+  @IsNotEmpty()
+  readonly country: string;
+
   @ApiProperty({
     type: String,
     description: 'date_of_event',
