@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class PhotosService {
+export class FilesService {
   async findAll(event_id: string) {
     return `all photos`;
   }

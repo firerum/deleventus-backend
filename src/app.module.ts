@@ -31,7 +31,7 @@ import { TicketingService } from './ticketing/ticketing.service';
 import { TicketingController } from './ticketing/ticketing.controller';
 import { TicketEntity } from './ticketing/entity/Ticket.entity';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { PhotosModule } from './photos/photos.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -44,7 +44,7 @@ import { PhotosModule } from './photos/photos.module';
     AttendeesModule,
     MailingModule,
     TicketingModule,
-    PhotosModule,
+    FilesModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({

@@ -7,15 +7,15 @@ import {
   Body,
   UploadedFiles,
 } from '@nestjs/common';
-import { PhotosService } from './photos.service';
+import { FilesService } from './files.service';
 
 @Controller({ path: 'api/events/:event_id/photos', version: '1' })
-export class PhotosController {
-  constructor(private readonly photosService: PhotosService) {}
+export class FilesController {
+  constructor(private readonly filesService: FilesService) {}
 
   @Get()
   findAllPhotos(@Param('event_id') event_id: string) {
-    return this.photosService.findAll(event_id);
+    return this.filesService.findAll(event_id);
   }
 
   @Post()
@@ -23,11 +23,11 @@ export class PhotosController {
     @Param('event_id') event_id: string,
     @UploadedFiles() files: any,
   ) {
-    return this.photosService.create(event_id, files);
+    return this.filesService.create(event_id, files);
   }
 
   @Delete('id')
   deletePhoto(@Param('id') id: string) {
-    return this.photosService.delete(id);
+    return this.filesService.delete(id);
   }
 }
