@@ -42,14 +42,10 @@ export class UserEntity {
   @Column({ nullable: true, default: false })
   is_verified: boolean;
 
-  @OneToMany(() => EventEntity, (eventEntity) => eventEntity.user, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => EventEntity, (eventEntity) => eventEntity.user)
   events: EventEntity[];
 
-  @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.user, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.user)
   comments: CommentEntity[];
 
   @OneToMany(() => AttendeeEntity, (attendeeEntity) => attendeeEntity.user)

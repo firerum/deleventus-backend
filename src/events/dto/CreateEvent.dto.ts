@@ -35,7 +35,7 @@ export class CreateEventDto {
   @ApiProperty({
     type: String,
     description: 'date_of_event',
-    default: Date.now(),
+    default: '2023-05-09',
   })
   @IsString()
   @IsNotEmpty()

@@ -56,9 +56,7 @@ export class EventEntity {
   })
   user: UserEntity;
 
-  @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.event, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => CommentEntity, (commentEntity) => commentEntity.event)
   comments: CommentEntity[];
 
   @OneToMany(() => AttendeeEntity, (attendeeEntity) => attendeeEntity.event)

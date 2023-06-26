@@ -54,6 +54,10 @@ export class CommentsService {
       throw new BadRequestException(error.message);
     }
     try {
+      const event = await this.eventsService.findSingle(event_id);
+      if (!event) {
+        throw new BadRequestException('Event Does not Exist');
+      }
       const query = `
         INSERT INTO comment_entity(comment, event_id, user_id)
         VALUES ($1, $2, $3) 

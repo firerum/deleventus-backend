@@ -33,7 +33,7 @@ export class UpdateEventDto {
   @ApiPropertyOptional({
     type: String,
     description: 'date_of_event',
-    default: Date.now(),
+    default: '2023-05-07',
   })
   @IsString()
   @IsOptional()
