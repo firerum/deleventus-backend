@@ -80,7 +80,9 @@ export class AuthService {
   // @routes /v1/api/auth/signin
   // @method POST request
   // @desc sign in user
-  async signin(auth: AuthDto): Promise<User> {
+  async signin(
+    auth: AuthDto,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const { error, value } = validateSignIn(auth);
     if (error) {
       throw new BadRequestException(error.message);
@@ -104,7 +106,7 @@ export class AuthService {
         user.email,
       );
       await this.updateRefreshToken(user.id, refresh_token);
-      return { ...user, password: '', access_token, refresh_token };
+      return { access_token, refresh_token };
     } catch (error) {
       throw error;
     }
