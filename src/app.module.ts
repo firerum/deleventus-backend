@@ -68,8 +68,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
       transport: 'smtps://user@domain.com:pass@smtp.domain.com',
     }),
     ThrottlerModule.forRoot({
-      ttl: 60, // time in seconds
-      limit: 20, // number of api calls
+      //   ttl: 60, // time in seconds
+      //   limit: 20, // number of api calls
     }),
   ],
   controllers: [
