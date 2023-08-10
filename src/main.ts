@@ -13,7 +13,11 @@ async function bootstrap() {
   });
 
   // accept cross origin
-  app.enableCors();
+  app.enableCors({
+    origin: 'https://deleventus-frontend.vercel.app',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   // helmet for proper headers
   app.use(helmet());
