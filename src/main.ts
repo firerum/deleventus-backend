@@ -19,6 +19,7 @@ async function bootstrap() {
       'https://deleventus-frontend.onrender.com',
       'http://localhost:3000',
     ],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
