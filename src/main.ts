@@ -14,8 +14,10 @@ async function bootstrap() {
 
   // accept cross origin
   app.enableCors({
-    origin: '*',
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: [
+      'https://deleventus-frontend.vercel.app',
+      'https://deleventus-frontend.onrender.com',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
