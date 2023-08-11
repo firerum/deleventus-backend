@@ -69,7 +69,11 @@ import { ThrottlerModule } from '@nestjs/throttler';
     }),
     ThrottlerModule.forRoot({
       //   ttl: 60, // time in seconds
+<<<<<<< Updated upstream
       //   limit: 20, // number of api calls
+=======
+      //   limit: 50, // number of api calls
+>>>>>>> Stashed changes
     }),
   ],
   controllers: [
