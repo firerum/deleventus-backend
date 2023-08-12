@@ -31,7 +31,9 @@ export class AuthController {
   @ApiBody({ type: CreateUserDto }) // to ensure swagger understands the request type
   @HttpCode(HttpStatus.CREATED)
   @Post('signup')
-  signup(@Body() auth: CreateUserDto): Promise<User> {
+  signup(
+    @Body() auth: CreateUserDto,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     return this.authService.signup(auth);
   }
 
