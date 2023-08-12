@@ -30,15 +30,21 @@ export class AuthService {
   // @routes /v1/api/auth/signup
   // @method POST request
   // @desc create new user
-  async signup(auth: CreateUserDto): Promise<User> {
+  async signup(
+    auth: CreateUserDto,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const { error, value } = validateCreateUser(auth);
     if (error) {
       throw new BadRequestException(error.message);
     }
     try {
       // check if user already exists
-      const user = await this.usersService.findByEmail(value.email);
-      if (user && user['response'] !== 'User Does not Exist') {
+      const emailQuery = 'SELECT email FROM user_entity WHERE email = $1';
+      const { rows: emailRow } = await this.pgService.pool.query(emailQuery, [
+        value.email,
+      ]);
+      const [email] = emailRow;
+      if (email) {
         throw new HttpException(
           'User Exists. Please Sign In',
           HttpStatus.CONFLICT,
@@ -71,7 +77,7 @@ export class AuthService {
       );
       await this.updateRefreshToken(rows[0].id, refresh_token);
       this.mailingService.sendVerificationLink(rows[0].email); // verify email by sending valid token link
-      return { ...rows[0], password: '', access_token, refresh_token };
+      return { access_token, refresh_token };
     } catch (error) {
       throw error;
     }
@@ -80,7 +86,9 @@ export class AuthService {
   // @routes /v1/api/auth/signin
   // @method POST request
   // @desc sign in user
-  async signin(auth: AuthDto): Promise<User> {
+  async signin(
+    auth: AuthDto,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const { error, value } = validateSignIn(auth);
     if (error) {
       throw new BadRequestException(error.message);
@@ -104,7 +112,7 @@ export class AuthService {
         user.email,
       );
       await this.updateRefreshToken(user.id, refresh_token);
-      return { ...user, password: '', access_token, refresh_token };
+      return { access_token, refresh_token };
     } catch (error) {
       throw error;
     }
