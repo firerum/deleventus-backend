@@ -17,6 +17,7 @@ async function bootstrap() {
     origin: [
       'https://deleventus-frontend.vercel.app',
       'https://deleventus-frontend.onrender.com',
+      'http://localhost:3000',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
