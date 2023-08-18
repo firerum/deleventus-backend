@@ -6,16 +6,8 @@ import { UpdateUserDto } from 'src/users/dto/UpdateUser.dto';
 // user registration schema
 export const validateCreateUser = (body: CreateUserDto): any => {
   const schema = Joi.object({
-    first_name: Joi.string().lowercase().trim().min(3).required(),
-    last_name: Joi.string().lowercase().min(3).trim().required(),
     email: Joi.string().lowercase().email().min(3).trim().required(),
     password: Joi.string().min(6).required(),
-    username: Joi.string().lowercase().trim().min(3),
-    gender: Joi.string().valid('male', 'female', 'other').trim(),
-    phone_no: Joi.number(),
-    avatar: Joi.string().trim(),
-    city: Joi.string().trim(),
-    country: Joi.string(),
     created_at: Joi.date().timestamp().default(new Date()),
   });
 

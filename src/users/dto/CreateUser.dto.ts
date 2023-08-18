@@ -1,25 +1,7 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsEmail,
-  IsOptional,
-  MinLength,
-  IsEnum,
-} from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Gender } from '../interface/User.interface';
+import { IsString, IsNotEmpty, IsEmail, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
-  @ApiProperty({ type: String, description: 'first_name', default: 'John' })
-  @IsString()
-  @IsNotEmpty()
-  readonly first_name: string;
-
-  @ApiProperty({ type: String, description: 'last_name', default: 'Doe' })
-  @IsString()
-  @IsNotEmpty()
-  readonly last_name: string;
-
   @ApiProperty({
     type: String,
     description: 'email',
@@ -34,29 +16,4 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(6)
   readonly password: string;
-
-  @ApiPropertyOptional({ type: String, description: 'username' })
-  @IsString()
-  @IsOptional()
-  readonly username?: string;
-
-  @ApiPropertyOptional({ enum: Gender, description: 'gender' })
-  @IsEnum(Gender)
-  @IsOptional()
-  readonly gender?: Gender;
-
-  @ApiPropertyOptional({ type: String, description: 'phone_no' })
-  @IsString()
-  @IsOptional()
-  readonly phone_no?: string;
-
-  @ApiPropertyOptional({ type: String, description: 'avatar' })
-  @IsString()
-  @IsOptional()
-  readonly avatar?: string;
-
-  @ApiPropertyOptional({ type: String, description: 'country' })
-  @IsString()
-  @IsOptional()
-  readonly country?: string;
 }
