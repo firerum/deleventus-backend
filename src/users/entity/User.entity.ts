@@ -9,10 +9,10 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   first_name: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   last_name: string;
 
   @Column({ nullable: false, unique: true })
