@@ -16,6 +16,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'https://app.deleventus.com',
+      'https://www.app.deleventus.com',
       'https://deleventus-frontend.vercel.app',
       'https://deleventus-frontend.onrender.com',
       'http://localhost:3000',
