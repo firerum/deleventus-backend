@@ -20,8 +20,9 @@ import { User } from 'src/users/interface/User.interface';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { UserRequestObject } from 'src/auth/custom-decorator/user-object.decorator';
 import { EmailConfirmationGuard } from 'src/auth/guard/EmailConfirmation.guard';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags, ApiBody } from '@nestjs/swagger';
 import { validateIdParam } from 'src/utils/validateParam';
+import { PaginationOptionsDto } from './dto/PaginationOptions.dto';
 
 @ApiTags('Events')
 @ApiBearerAuth('access_token')
@@ -30,6 +31,17 @@ import { validateIdParam } from 'src/utils/validateParam';
 @Controller({ path: '/api/events', version: '1' })
 export class EventsController {
   constructor(private readonly eventService: EventsService) {}
+
+  @ApiQuery({ name: 'page number', description: 'page number' })
+  @ApiQuery({ name: 'page size', description: 'number of data per page' })
+  @Get()
+  findAllWithPagination(
+    @Query('page') page: number,
+    @Query('pageSize') pageSize: number,
+  ) {
+    const paginationOptions: PaginationOptionsDto = { page, pageSize };
+    return this.eventService.findAllWithPagination(paginationOptions);
+  }
 
   @Get()
   findAllEvents(@UserRequestObject() user: User): Promise<UserEvent[]> {
