@@ -1,8 +1,6 @@
 import {
   BadRequestException,
   ForbiddenException,
-  HttpException,
-  HttpStatus,
   Injectable,
 } from '@nestjs/common';
 import { User } from 'src/users/interface/User.interface';
@@ -53,13 +51,13 @@ export class UsersService {
       if (rows.length < 1) {
         throw new BadRequestException('User Does not Exist');
       }
-      const result = rows.map(async (user: User) => {
-        const events = await this.eventService.findAll(user.id);
-        user.events = events;
-        user.password = '';
-      });
-      await Promise.allSettled(result);
-      return rows[0];
+      const user = rows[0];
+      const events = await this.eventService.findAll(user.id);
+
+      user.events = events;
+      user.password = '';
+
+      return user;
     } catch (error) {
       throw error;
     }

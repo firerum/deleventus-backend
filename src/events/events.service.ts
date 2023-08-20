@@ -18,6 +18,7 @@ import { PgService } from 'src/pg/pg.service';
 import { CommentsService } from 'src/comments/comments.service';
 import { AttendeesService } from 'src/attendees/attendees.service';
 import { TicketingService } from 'src/ticketing/ticketing.service';
+import { PaginationOptionsDto } from './dto/PaginationOptions.dto';
 
 @Injectable()
 export class EventsService {
@@ -28,6 +29,68 @@ export class EventsService {
     @Inject(forwardRef(() => TicketingService))
     private readonly ticketingService: TicketingService,
   ) {}
+
+  //TODO refactor code
+  // Retrieve events with pagination
+  // @routes /v1/api/events?page=1&pageSize=10
+  // @method GET request
+  // @desc retrieve all events
+  async findAllWithPagination(
+    paginationOptions: PaginationOptionsDto,
+  ): Promise<{ events: UserEvent[]; total: number }> {
+    try {
+      const { page, pageSize } = paginationOptions;
+      const offset = (page - 1) * pageSize;
+
+      const query = `
+        SELECT * FROM event_entity OFFSET $1 LIMIT $2
+      `;
+      const { rows, rowCount } = await this.pgService.pool.query(query, [
+        offset,
+        pageSize,
+      ]);
+
+      //   Populate comments, attendees, and tickets for each event
+      //   const populatedEvents = await this.populateFields(rows);
+      const result = this.populateFields(rows);
+      await Promise.allSettled(result);
+
+      return { events: rows, total: rowCount };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  //TODO refactor code
+  // Find user id events with pagination
+  // @routes /v1/api/user-events?page=1&pageSize=10&user_id=your_user_id
+  // @method GET request
+  async findUserEventsWithPagination(
+    user_id: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ events: UserEvent[]; total: number }> {
+    try {
+      const offset = (page - 1) * pageSize;
+      const query = `
+        SELECT * FROM event_entity WHERE owner_id = $1 OFFSET $2 LIMIT $3
+      `;
+      const { rows, rowCount } = await this.pgService.pool.query(query, [
+        user_id,
+        offset,
+        pageSize,
+      ]);
+
+      // Populate comments, attendees, and tickets for each event
+      const populatedEvents = await this.populateData(rows);
+      //   const result = this.populateFields(rows);
+      //   await Promise.allSettled(result);
+
+      return { events: populatedEvents, total: rowCount };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   // @routes /v1/api/events
   // @method GET request
@@ -47,6 +110,7 @@ export class EventsService {
     }
   }
 
+  //TODO refactor code
   // @desc method to populate comments, tickets, attendees of event
   populateFields(rows: any[]): Promise<void>[] {
     const result = rows.map(async (e: UserEvent) => {
@@ -58,6 +122,44 @@ export class EventsService {
       e.tickets = tickets;
     });
     return result;
+  }
+
+  //More efficient way to handle the comment, ticket and attendee population of an event
+  async populateData(events: UserEvent[]): Promise<UserEvent[]> {
+    try {
+      const populatedEvents = await Promise.all(
+        events.map(async (e: UserEvent) => {
+          try {
+            const [comments, attendees, tickets] = await Promise.all([
+              this.commentService.findAll(e.id),
+              this.attendeeService.findAll(e.id),
+              this.ticketingService.findAll(e.id),
+            ]);
+
+            e.comments = comments;
+            e.attendees = attendees;
+            e.tickets = tickets;
+
+            return e;
+          } catch (error) {
+            // Handle specific error for this event's operations
+            // Log the error or perform appropriate error handling
+            console.error(`Error processing event ${e.id}: ${error.message}`);
+
+            // You can choose to continue processing other events or stop altogether
+            // Returning the unmodified event allows you to continue processing others
+            return e;
+          }
+        }),
+      );
+
+      return populatedEvents;
+    } catch (error) {
+      // Handle overall error for the populateFields function
+      // Log the error or perform appropriate error handling
+      console.error(`Error populating fields: ${error.message}`);
+      throw error; // Re-throw the error or return a default value as needed
+    }
   }
 
   // @routes /v1/api/events/filter?category=
