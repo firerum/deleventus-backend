@@ -37,8 +37,8 @@ export class AuthController {
     return this.authService.signup(auth);
   }
 
-  @Get('confirm-email')
-  async confirm(@Query('token') token: string): Promise<{ message: string }> {
+  @Post('confirm-email')
+  async confirm(@Body('token') token: string): Promise<{ message: string }> {
     const email = await this.mailingService.decodeToken(token, 'OTC_SECRET');
     return this.mailingService.confirmEmail(email);
   }
