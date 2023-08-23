@@ -77,7 +77,7 @@ export class MailingService {
         to: body.email,
         from: {
           name: 'Deleventus',
-          address: 'ademuyiwaadewuyi@gmail.com',
+          address: process.env.EMAIL,
         },
         subject: body.subject,
         text: body.text,
@@ -105,7 +105,7 @@ export class MailingService {
   public async sendVerificationLink(email: string): Promise<void> {
     try {
       const token = this.createToken(email, 'OTC_SECRET', '24hr');
-      const url = `Welcome to Deleventus. To confirm your email, click here: ${process.env.ENV_URL}/v1/api/auth/confirm-email?token=${token}`;
+      const url = `Welcome to Deleventus. To confirm your email, click here: ${process.env.ENV_URL}/confirm-email?token=${token}`;
       const body = {
         email,
         html: `<p>${url}</p>`,
@@ -177,7 +177,7 @@ export class MailingService {
         );
       }
       const token = this.createToken(email, 'PASSWORD_SECRET', '3m');
-      const url = `Welcome to Deleventus. To reset your password, click here: ${process.env.ENV_URL}/v1/api/auth/reset-password?token=${token}`;
+      const url = `Welcome to Deleventus. To reset your password, click here: ${process.env.ENV_URL}/reset-password?token=${token}`;
       const body = {
         email,
         html: `${url}`,
