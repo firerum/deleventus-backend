@@ -25,9 +25,6 @@ import { validateIdParam } from 'src/utils/validateParam';
 import { PaginationOptionsDto } from './dto/PaginationOptions.dto';
 
 @ApiTags('Events')
-@ApiBearerAuth('access_token')
-@UseGuards(EmailConfirmationGuard) // this is above the '@UseGuards(JwtGuard)' because decorators are read from bottom to top
-@UseGuards(JwtGuard) // add the guard to the controller itself instead of individual endpoints
 @Controller({ path: '/api/events', version: '1' })
 export class EventsController {
   constructor(private readonly eventService: EventsService) {}
@@ -43,6 +40,9 @@ export class EventsController {
     return this.eventService.findAllWithPagination(paginationOptions);
   }
 
+  @ApiBearerAuth('access_token')
+  @UseGuards(EmailConfirmationGuard) // this is above the '@UseGuards(JwtGuard)' because decorators are read from bottom to top
+  @UseGuards(JwtGuard) // add the guard to the controller itself instead of individual endpoints
   @Get()
   findAllEvents(@UserRequestObject() user: User): Promise<UserEvent[]> {
     return this.eventService.findAll(user.id);
@@ -52,9 +52,8 @@ export class EventsController {
   @Get('filter')
   findEventsByCategory(
     @Query('category') category: Category,
-    @UserRequestObject() user: User,
   ): Promise<UserEvent[]> {
-    return this.eventService.findByCategory(user.id, category);
+    return this.eventService.findByCategory(category);
   }
 
   @Get(':id')
@@ -67,6 +66,9 @@ export class EventsController {
     return this.eventService.findOne(id, user.id);
   }
 
+  @ApiBearerAuth('access_token')
+  @UseGuards(EmailConfirmationGuard) // this is above the '@UseGuards(JwtGuard)' because decorators are read from bottom to top
+  @UseGuards(JwtGuard) // add the guard to the controller itself instead of individual endpoints
   @HttpCode(HttpStatus.CREATED)
   @Post()
   createEvent(
@@ -76,6 +78,9 @@ export class EventsController {
     return this.eventService.create(createDto, user.id);
   }
 
+  @ApiBearerAuth('access_token')
+  @UseGuards(EmailConfirmationGuard) // this is above the '@UseGuards(JwtGuard)' because decorators are read from bottom to top
+  @UseGuards(JwtGuard) // add the guard to the controller itself instead of individual endpoints
   @Put(':id')
   updateEvent(
     @Param('id') id: string,
@@ -87,6 +92,9 @@ export class EventsController {
     return this.eventService.update(id, updateDto, user.id);
   }
 
+  @ApiBearerAuth('access_token')
+  @UseGuards(EmailConfirmationGuard) // this is above the '@UseGuards(JwtGuard)' because decorators are read from bottom to top
+  @UseGuards(JwtGuard) // add the guard to the controller itself instead of individual endpoints
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   deleteEvent(

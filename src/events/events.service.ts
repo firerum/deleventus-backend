@@ -165,10 +165,7 @@ export class EventsService {
   // @routes /v1/api/events/filter?category=
   // @method GET request
   // @desc retrieve all events by category
-  async findByCategory(
-    user_id: string,
-    category: Category,
-  ): Promise<UserEvent[]> {
+  async findByCategory(category: Category): Promise<UserEvent[]> {
     try {
       if (!Object.values(Category).includes(category)) {
         throw new BadRequestException(
@@ -176,12 +173,9 @@ export class EventsService {
         );
       }
       const query = `
-        SELECT * FROM event_entity WHERE owner_id = $1 AND category = $2
+        SELECT * FROM event_entity WHERE category = $1
     `;
-      const { rows } = await this.pgService.pool.query(query, [
-        user_id,
-        category,
-      ]);
+      const { rows } = await this.pgService.pool.query(query, [category]);
       const result = this.populateFields(rows);
       await Promise.allSettled(result);
       return rows;

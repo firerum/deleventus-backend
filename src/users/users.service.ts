@@ -55,7 +55,6 @@ export class UsersService {
       const events = await this.eventService.findAll(user.id);
 
       user.events = events;
-      user.password = '';
 
       return user;
     } catch (error) {
@@ -124,12 +123,15 @@ export class UsersService {
               WHERE id = $11
               RETURNING *
           `;
+
+      const hash = await argon.hash(password);
+
       const { rows } = await this.pgService.pool.query(query, [
         first_name ?? user?.first_name,
         last_name ?? user?.last_name,
         email ?? user?.email,
         gender ?? user?.gender,
-        password ?? user?.password,
+        hash ?? user?.password,
         country ?? user?.country,
         city ?? user?.city,
         phone_no ?? user.phone_no,
@@ -137,7 +139,10 @@ export class UsersService {
         updated_at,
         id,
       ]);
-      return { ...rows[0], password: '' };
+
+      const [updatedUser]: [User] = rows;
+
+      return updatedUser;
     } catch (error) {
       throw error;
     }
