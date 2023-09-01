@@ -28,7 +28,7 @@ export class UpdateUserDto {
   @IsOptional()
   readonly username?: string;
 
-  @ApiPropertyOptional({ enum: Gender, description: 'first_name' })
+  @ApiPropertyOptional({ enum: Gender, description: 'gender' })
   @IsEnum(Gender)
   @IsOptional()
   readonly gender?: Gender;

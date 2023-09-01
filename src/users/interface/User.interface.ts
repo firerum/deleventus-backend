@@ -3,6 +3,8 @@ import { UserEvent } from 'src/events/interface/UserEvent.interface';
 export enum Gender {
   MALE = 'male',
   FEMALE = 'female',
+  'NON-BINARY' = 'non-binary',
+  TRANSGENDER = 'transgender',
   OTHER = 'other',
 }
 

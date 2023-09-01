@@ -31,11 +31,13 @@ export const validateUpdateUser = (body: UpdateUserDto): any => {
     email: Joi.string().lowercase().email().min(3).trim(),
     password: Joi.string().min(6),
     username: Joi.string().lowercase().trim().min(3),
-    gender: Joi.string().valid('male', 'female', 'other').trim(),
+    gender: Joi.string()
+      .valid('male', 'female', 'non-binary', 'transgender', 'other')
+      .trim(),
     phone_no: Joi.string().trim(),
-    avatar: Joi.string().trim(),
-    city: Joi.string().trim(),
-    country: Joi.string(),
+    avatar: Joi.string().lowercase().trim(),
+    city: Joi.string().lowercase().trim(),
+    country: Joi.string().lowercase().trim(),
     updated_at: Joi.date().timestamp().default(new Date()),
   });
 
