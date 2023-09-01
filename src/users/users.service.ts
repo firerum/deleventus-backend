@@ -52,10 +52,6 @@ export class UsersService {
         throw new BadRequestException('User Does not Exist');
       }
       const user = rows[0];
-      const events = await this.eventService.findAll(user.id);
-
-      user.events = events;
-
       return user;
     } catch (error) {
       throw error;
