@@ -152,7 +152,7 @@ export class MailingService {
     }
   }
 
-  // resend confirmation link for user whose token expired or who didn't see link
+  // resend confirmation link for user whose token expired OR who didn't see link
   public async resendConfirmationLink(
     user_id: string,
   ): Promise<{ message: string }> {
