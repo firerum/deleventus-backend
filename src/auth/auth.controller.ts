@@ -46,7 +46,7 @@ export class AuthController {
   @ApiBearerAuth('access_token')
   @UseGuards(JwtGuard)
   @Get('resend-confirmation-link')
-  resendConfirm(@UserRequestObject() user: User): Promise<void> {
+  resendConfirm(@UserRequestObject() user: User): Promise<{ message: string }> {
     return this.mailingService.resendConfirmationLink(user.id);
   }
 

@@ -153,13 +153,16 @@ export class MailingService {
   }
 
   // resend confirmation link for user whose token expired or who didn't see link
-  public async resendConfirmationLink(user_id: string) {
+  public async resendConfirmationLink(
+    user_id: string,
+  ): Promise<{ message: string }> {
     try {
       const user = await this.usersService.findOne(user_id);
       if (user.is_verified) {
         throw new BadRequestException('Email already confirmed');
       }
       await this.sendVerificationLink(user.email);
+      return { message: 'Email verication link sent' };
     } catch (error) {
       throw error;
     }
