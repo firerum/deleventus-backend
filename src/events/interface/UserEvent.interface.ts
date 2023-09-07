@@ -15,6 +15,11 @@ export enum Category {
   OTHER = 'other',
 }
 
+export enum TicketType {
+  FREE = 'free',
+  PAID = 'paid',
+}
+
 export interface UserEvent {
   id: string;
   name: string;
@@ -26,6 +31,8 @@ export interface UserEvent {
   avatar: string;
   comments?: Comment[];
   attendees?: Attendee[];
+  ticket_quantity: number;
+  ticket_type: TicketType;
   tickets?: Ticket[];
   updated_at?: string;
   owner_id?: string;
