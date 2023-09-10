@@ -1,7 +1,11 @@
 import { CommentEntity } from 'src/comments/entity/Comment.entity';
 import { UserEntity } from 'src/users/entity/User.entity';
 import { AttendeeEntity } from 'src/attendees/entity/Attendee.entity';
-import { Visibilty, Category } from '../interface/UserEvent.interface';
+import {
+  Visibilty,
+  Category,
+  TicketType,
+} from '../interface/UserEvent.interface';
 import {
   Column,
   Entity,
@@ -58,6 +62,12 @@ export class EventEntity {
 
   @OneToMany(() => TicketEntity, (ticketEntity) => ticketEntity.event)
   tickets: TicketEntity[];
+
+  @Column({ nullable: true })
+  ticket_quantity: number;
+
+  @Column({ type: 'enum', enum: TicketType, default: TicketType.FREE })
+  ticket_type: TicketType;
 
   @Column({
     type: 'timestamptz',
