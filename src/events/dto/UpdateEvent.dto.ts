@@ -1,6 +1,16 @@
-import { IsString, IsEnum, IsOptional, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsOptional,
+  IsDate,
+  IsNumber,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Category, Visibilty } from '../interface/UserEvent.interface';
+import {
+  Category,
+  Visibilty,
+  TicketType,
+} from '../interface/UserEvent.interface';
 
 export class UpdateEventDto {
   @ApiPropertyOptional({ type: String, description: 'name' })
@@ -35,6 +45,20 @@ export class UpdateEventDto {
   @IsString()
   @IsOptional()
   readonly description?: string;
+
+  @ApiPropertyOptional({ type: Number, description: 'ticket quantity' })
+  @IsNumber()
+  @IsOptional()
+  readonly ticket_quantity: number;
+
+  @ApiPropertyOptional({
+    enum: TicketType,
+    description: 'ticket type',
+    default: TicketType.FREE,
+  })
+  @IsEnum(TicketType)
+  @IsOptional()
+  readonly ticket_type: TicketType;
 
   @ApiPropertyOptional({
     enum: Visibilty,

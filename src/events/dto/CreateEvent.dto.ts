@@ -1,6 +1,10 @@
-import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Category, Visibilty } from '../interface/UserEvent.interface';
+import {
+  Category,
+  TicketType,
+  Visibilty,
+} from '../interface/UserEvent.interface';
 
 export class CreateEventDto {
   @ApiProperty({ type: String, description: 'name' })
@@ -35,6 +39,19 @@ export class CreateEventDto {
   @IsString()
   @IsNotEmpty()
   readonly description: string;
+
+  @ApiProperty({ type: Number, description: 'ticket quantity' })
+  @IsNumber()
+  readonly ticket_quantity: number;
+
+  @ApiProperty({
+    enum: TicketType,
+    description: 'ticket type',
+    default: TicketType.FREE,
+  })
+  @IsEnum(TicketType)
+  @IsNotEmpty()
+  readonly ticket_type: TicketType;
 
   @ApiProperty({
     enum: Visibilty,

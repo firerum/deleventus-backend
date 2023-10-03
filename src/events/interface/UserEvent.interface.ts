@@ -5,11 +5,14 @@ import { Ticket } from 'src/ticketing/interface/Ticket.interface';
 export enum Visibilty {
   PUBLIC = 'public',
   PRIVATE = 'private',
+  PERSONAL = 'personal',
 }
 
 export enum Category {
   WEDDING = 'wedding',
   BIRTHDAY = 'birthday',
+  CONCERT = 'concert',
+  FESTIVAL = 'festival',
   CONVOCATION = 'convocation',
   ANNIVERSARY = 'anniversary',
   OTHER = 'other',

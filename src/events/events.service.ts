@@ -227,11 +227,19 @@ export class EventsService {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
     try {
-      const { name, category, venue, date_of_event, description, visibility } =
-        value;
+      const {
+        name,
+        category,
+        venue,
+        date_of_event,
+        description,
+        visibility,
+        ticket_quantity,
+        ticket_type,
+      } = value;
       const query = `
-        INSERT INTO event_entity(name, category, venue, date_of_event, description, visibility, owner_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7) 
+        INSERT INTO event_entity(name, category, venue, date_of_event, description, visibility, ticket_quantity, ticket_type, owner_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
         RETURNING *
       `;
       const { rows } = await this.pgService.pool.query(query, [
@@ -241,6 +249,8 @@ export class EventsService {
         date_of_event,
         description,
         visibility,
+        ticket_quantity,
+        ticket_type,
         user_id,
       ]);
       return rows[0];
@@ -269,6 +279,8 @@ export class EventsService {
         date_of_event,
         description,
         visibility,
+        ticket_quantity,
+        ticket_type,
         updated_at,
       } = value;
       //check if event already exists and pre-populate the properties that weren't updated
@@ -282,8 +294,9 @@ export class EventsService {
       const query = `
         UPDATE event_entity SET 
         name = $1, category = $2, venue = $3, date_of_event = $4, description = $5,
-        visibility = $6, updated_at = $7
-        WHERE id = $8
+        visibility = $6, ticket_quantity = $7,
+        ticket_type = $8, updated_at = $9
+        WHERE id = $10
         RETURNING *
       `;
       const { rows } = await this.pgService.pool.query(query, [
@@ -293,6 +306,8 @@ export class EventsService {
         date_of_event ?? event?.date_of_event,
         description ?? event?.description,
         visibility ?? event?.visibility,
+        ticket_quantity,
+        ticket_type,
         updated_at,
         id,
       ]);
